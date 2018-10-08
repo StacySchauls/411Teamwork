@@ -11,9 +11,11 @@ int main(int argc, char **argv){
 	}
 	n = atoi(argv[1]);
 	G = atoi(argv[2]);
-	grid = (char **)malloc(n * sizeof(char*));
+	grid = (CELL **)malloc(n * sizeof(CELL*));
 	for(i = 0; i < n; i++){
-		grid[i] = (char*)(malloc(n*sizeof(char)));
+		grid[i] = (CELL*)(malloc(n*sizeof(CELL)));
+		grid[i]->cur = 0;
+		grid[i]->old = '\0';
 	}
 	// printf("We have %d rows/col and %d generations\n",n,G);
 
@@ -38,16 +40,18 @@ int generateInitialGoL(){
 	CELL **my_grid = (CELL **)malloc((n/p)*sizeof(CELL*));
 	for(j = 0; j<(n/p); j++){
 		my_grid[j] = (CELL*)malloc(n*sizeof(CELL));
+		grid[j]->cur = 0;
+		grid[j]->old = '\0';
 	}
 	int rNum,i,k;
-	if(rank == 0){
+	if(rank == 0){// master process 0
 		srand(time(NULL));
-		for(i=0;i<p;i++){
+		for(i=0;i<p;i++){//sending random number to each process
 			rNum = randNum();
 			MPI_Send(&rNum,1, MPI_INT, i, 0, MPI_COMM_WORLD);
 		}
 
-	}else{
+	}else{ // workers 1 :: p-1
 		int generated_num;
 		MPI_Recv(&rNum, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		srand(rNum);
@@ -57,27 +61,42 @@ int generateInitialGoL(){
 				generated_num = randNum();
 				if(generated_num %2 == 0){
 
-					my_grid[i][k].old = my_grid[i][k].cur = ALIVE;
-					printf("cell at [%d][%d} is %c\n",i,k, my_grid[i][k].cur);
-					//printf("%c"),my_grid[i][k].cur;
+					my_grid[i][k].old = my_grid[i][k].cur = ALIVE;// set both to alive
+					//printf("cell at [%d][%d] is %c\n",i,k, my_grid[i][k].cur);
+					printf("%c", my_grid[i][k].cur);
 				}else{
 
 					my_grid[i][k].old = my_grid[i][k].cur = DEAD;
 
-					printf(""),my_grid[i][k].cur;
+					printf("%c", my_grid[i][k].cur);
 				}
 			}
 		}
 	}
-}
-
-int simulate(){
-
 	return 0;
 }
 
-int determineState(int row, int col){
+int simulate(){
+	return 0;
+}
 
+int determineState(CELL **grid, char buf[], int row){//updates a full row
+	int num_alive = 0, col = 0;
+	// count the number of neighbors with old alive
+	
+	//two communication steps 
+	if (row == 0 || row == (n/p - 1)) { //use buffer
+	}
+	
+	for (col = 0; col < n; col++) {
+		//set num_alive for each col value
+		if (num_alive > 2 && num_alive < 6) { //we are alive
+			grid[row][col].cur = ALIVE;
+		}
+		else{
+			grid[row][col].cur = DEAD;
+		}
+	}
 	return 0;
 }
 int randNum(){

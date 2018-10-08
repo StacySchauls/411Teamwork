@@ -8,7 +8,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <getopt.h>
+#include <string.h>
 #include <stdio.h>
 
 #define DEAD '.'
@@ -30,6 +30,7 @@ int displayGoL();
 int randNum();
 int simulate();
 int determineState();
+void getStatesFromRank(char buf[], int sender, int caller);
 //global variables
 int n, G;     //#rows and #col  //# of generatioons
 int p, rank;   //number of processors and process id

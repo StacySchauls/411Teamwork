@@ -82,14 +82,119 @@ int simulate(){
 
 int determineState(CELL **grid, char buf[], int row){//updates a full row
 	int num_alive = 0, col = 0;
+	char val;
 	// count the number of neighbors with old alive
-	
-	//two communication steps 
+
+	//two communication steps
 	if (row == 0 || row == (n/p - 1)) { //use buffer
+
 	}
-	
+
 	for (col = 0; col < n; col++) {
 		//set num_alive for each col value
+
+
+		//assuming in our grid
+		if(row == 0){
+			//top row
+			//check Norths
+			if(buf[(col==0)?n-1:(col-1)].old == 'x'){
+				num_alive++;
+			}
+			if(buf[col].old == 'x'){
+				num_alive++;
+			}
+			if(buf[(col+1)%n].old == 'x'){
+				num_alive++;
+			}
+
+			//check souths
+			if(grid[row+1[(col==0)?n-1:(col-1)].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row+1][col].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row+1][(col+1)%n].old == 'x'){
+				num_alive++;
+			}
+
+			//current row
+			if(grid[row][(col==0)?n-1:(col-1)].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row][(col+1)%n].old == 'x'){
+				num_alive++;
+			}
+		}else if(row == (n/p)-1){//bottom row
+
+			//check Norths
+			if(grid[row-1][(col==0)?n-1:(col-1)].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row-1][col].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row-1][(col+1)%n].old == 'x'){
+				num_alive++;
+			}
+
+			//check souths
+			if(buf[(col==0)?n-1:(col-1)].old == 'x'){
+				num_alive++;
+			}
+			if(buf[col].old == 'x'){
+				num_alive++;
+			}
+			if(buf[(col+1)%n].old == 'x'){
+				num_alive++;
+			}
+
+			//current row
+			if(grid[row][(col==0)?n-1:(col-1)].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row][(col+1)%n].old == 'x'){
+				num_alive++;
+			}
+
+		}else{
+
+			if(grid[row-1][(col==0)?n-1:(col-1)].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row-1][col].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row-1][(col+1)%n].old == 'x'){
+				num_alive++;
+			}
+
+			//check souths
+			if(grid[row+1][(col==0)?n-1:(col-1)].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row+1][col].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row+1][(col+1)%n].old == 'x'){
+				num_alive++;
+			}
+
+			//current row
+			if(grid[row][(col==0)?n-1:(col-1)].old == 'x'){
+				num_alive++;
+			}
+			if(grid[row][(col+1)%n].old == 'x'){
+				num_alive++;
+			}
+
+		}
+
+
+
+
+
 		if (num_alive > 2 && num_alive < 6) { //we are alive
 			grid[row][col].cur = ALIVE;
 		}

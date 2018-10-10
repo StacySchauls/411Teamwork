@@ -3,7 +3,7 @@ extern int n, G;     //#rows and #col  //# of generatioons
 extern int p, rank;   //number of processors and process id
 extern CELL **grid, **nextGrid;
 
-int generateInitialGoL(){
+CELL **generateInitialGoL(){
 	int j;
 	int rNum,i,k; // <-- potential error spot
 	CELL **my_grid = (CELL **)malloc((n/p)*sizeof(CELL*));
@@ -42,11 +42,57 @@ int generateInitialGoL(){
 			}
 		}
 	}
-	return 0;
+	return my_grid;
 }
 
-int simulate(){
-	return 0;
+int simulate(CELL **grid, MPI_Comm comm){
+
+	int i, j = 0;
+	char buf[n],bufBelow[n],bufAbove[n];
+	memset(buf, 0, n);
+	memset(bufBelow, 0, n);
+	memset(bufAbove, 0, n);
+	while(j < G){
+		for(i = 0; i<n; i++){
+			buf[i] = grid[0][i].old;
+		}	
+		MPI_Barrier(comm);
+		if(rank != 1){
+			MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
+		}if else{
+			MPI_Send(buf, n, MPI_CHAR, p-1,0,comm);
+		}
+
+		if(rank == p-1){
+			MPI_Recv(bufBelow, n, MPI_CHAR, 1,0,comm);
+		}else{
+			MPI_Recv(bufBelow, n, MPI_CHAR, rank+1,0,comm);
+		}
+		MPI_Barrie(comm);
+
+		if(rank == p-1){
+			MPI_Send(buf, n, MPI_CHAR, 1,0,comm);
+		}if else{
+			MPI_Send(buf, n, MPI_CHAR, rank +1,0,comm);
+		}
+
+		if(rank == 1){
+			MPI_Recv(bufAbove, n, MPI_CHAR, p-1,0,comm);
+		}else{
+			MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm);
+		}
+
+		MPI_Barrier(comm);
+
+		determineState(grid,bufAbove,0);
+		for(i = i; i<(n/p)-1; i++){
+			determineState(grid,bufBelow,i);
+		}
+		j++;
+	}
+}	
+return 0;
+
 }
 
 int determineState(CELL **grid, char buf[], int row){//updates a full row
@@ -153,7 +199,7 @@ int determineState(CELL **grid, char buf[], int row){//updates a full row
 		if (num_alive > 2 && num_alive < 6) { //we are alive
 			grid[row][col].old = grid[row][col].cur;
 			grid[row][col].cur = ALIVE;
-			
+
 		}
 		else{
 			grid[row][col].old = grid[row][col].cur;

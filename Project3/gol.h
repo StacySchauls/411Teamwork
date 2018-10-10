@@ -24,11 +24,11 @@ typedef struct Cell{
 
 
 //function prototypes
-int generateInitialGoL();
+CELL **generateInitialGoL();
 int simulate();
 int displayGoL();
 int randNum();
-int simulate();
+int simulate(CELL **grid);
 int determineState();
 void getStatesFromRank(char buf[], int sender, int caller);
 //global variables

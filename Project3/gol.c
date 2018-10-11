@@ -28,14 +28,14 @@ CELL **generateInitialGoL(){
 				generated_num = randNum();
 				if(generated_num %2 == 0){
 
-					my_grid[i][k].old = my_grid[i][k].cur = ALIVE;// set both to alive
+					my_grid[i][k].old = my_grid[i][k].cur = 'x';// set both to alive
 					//printf("cell at [%d][%d] is %c\n",i,k, my_grid[i][k].cur);
-					//printf("%c", my_grid[i][k].cur);
+					printf("%c\n", my_grid[i][k].cur);
 				}else{
 
-					my_grid[i][k].old = my_grid[i][k].cur = DEAD;
+					my_grid[i][k].old = my_grid[i][k].cur = '.';
 
-					//printf("%c", my_grid[i][k].cur);
+					printf("%c", my_grid[i][k].cur);
 				}
 			}
 		}
@@ -44,7 +44,7 @@ CELL **generateInitialGoL(){
 }
 
 int simulate(CELL **grid, MPI_Comm comm, int rank){
-	printf("in simulate: rank %d",rank);
+
 	int i, j = 0;
 	char buf[n], bufBelow[n], bufAbove[n];
 
@@ -53,11 +53,11 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 	memset(bufAbove, 0, n);
 	if(rank == 0){
 		
-		printf("BARRIER1 in simulate: rank %d",rank);
+		printf("BARRIER1 in simulate: rank %d\n",rank);
 		MPI_Barrier(comm);
-		printf("BARRIER2 in simulate: rank %d",rank);
+		printf("BARRIER2 in simulate: rank %d\n",rank);
 		MPI_Barrier(comm);
-		printf("BARRIER3 in simulate: rank %d",rank);
+		printf("BARRIER3 in simulate: rank %d\n",rank);
 		MPI_Barrier(comm);
 	}else{
 
@@ -65,43 +65,39 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 			for(i = 0; i<n; i++){
 				buf[i] = grid[0][i].old;
 			}
-			printf("BARRIER1 in simulate: rank %d",rank);
+			printf("BARRIER1 in simulate: rank %d\n",rank);
 			MPI_Barrier(comm);
-			putchar('1');
 			if(rank != 1){
 				MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
 			}else{
 				MPI_Send(buf, n, MPI_CHAR, p-1,0,comm);
 			}
 
-			putchar('2');
 			if(rank == p-1){
 				MPI_Recv(bufBelow, n, MPI_CHAR, 1, 0, comm, MPI_STATUS_IGNORE);
 			}else{
 				MPI_Recv(bufBelow, n, MPI_CHAR, rank+1, 0, comm, MPI_STATUS_IGNORE);
 			}
-			printf("BARRIER2 in simulate: rank %d",rank);
+			printf("BARRIER2 in simulate: rank %d\n",rank);
 			MPI_Barrier(comm);
 
-			putchar('3');
 			if(rank == p-1){
 				MPI_Send(buf, n, MPI_CHAR, 1,0,comm);
 			}else{
 				MPI_Send(buf, n, MPI_CHAR, rank +1,0,comm);
 			}
 
-			putchar('4');
 			if(rank == 1){
 				MPI_Recv(bufAbove, n, MPI_CHAR, p-1,0,comm, MPI_STATUS_IGNORE);
 			}else{
 				MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm, MPI_STATUS_IGNORE);
 			}
 
-			printf("BARRIER3 in simulate: rank %d",rank);
+			printf("BARRIER3 in simulate: rank %d\n",rank);
 			MPI_Barrier(comm);
 
-			putchar('5');
 			determineState(grid,bufAbove,0);
+			printf("Here\n");
 			for(i = 1; i<(n/p)-1; i++){
 				determineState(grid,bufBelow,i);
 			}
@@ -235,13 +231,13 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	if (rank == 0) {
 		//recieve and print from each other process in order
 		for (i = 1; i < p-1; i++) {
-			printf("Receiving from %d \n",i);
+			printf("Rank %d is Receiving from %d \n",rank,i);
 			MPI_Recv(buf, blocksize, MPI_CHAR, i, 0, comm, MPI_STATUS_IGNORE);
 			for (j = 0; j < blocksize; j++){
 				if (!j%n && j != 0){
 					putchar('\n');
 				}
-				putchar(buf[j]);
+				//putchar(buf[j]);
 			}
 		}
 	}

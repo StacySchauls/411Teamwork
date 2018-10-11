@@ -28,7 +28,7 @@ typedef struct Cell{
 
 
 //function prototypes
-CELL **generateInitialGoL();
+CELL **generateInitialGoL(int rank);
 int simulate(CELL **grid, MPI_Comm comm, int rank);
 int determineState(CELL **grid,char buf[],int row);
 int displayGoL(CELL **grid, MPI_Comm comm,int rank);

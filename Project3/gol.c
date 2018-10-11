@@ -2,7 +2,7 @@
 extern int n, G;     //#rows and #col  //# of generatioons
 extern int p;   //number of processors and process id
 
-CELL **generateInitialGoL(){
+CELL **generateInitialGoL(int rank){
 	int j;
 	int rNum,i,k; // <-- potential error spot
 
@@ -20,6 +20,7 @@ CELL **generateInitialGoL(){
 		}
 	}else{ // workers 1 :: p-1
 		int generated_num;
+		printf("generateInitialGoL: rank %d\n", rank);
 		MPI_Recv(&rNum, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		srand(rNum);
 		for(i = 0; i<(n/p); i++){
@@ -28,12 +29,14 @@ CELL **generateInitialGoL(){
 				generated_num = randNum();
 				if(generated_num %2 == 0){
 
-					my_grid[i][k].old = my_grid[i][k].cur = 'x';// set both to alive
+					my_grid[i][k].old = 'x';
+					my_grid[i][k].cur = 'x';// set both to alive
 					//printf("cell at [%d][%d] is %c\n",i,k, my_grid[i][k].cur);
 					printf("%c\n", my_grid[i][k].cur);
 				}else{
 
-					my_grid[i][k].old = my_grid[i][k].cur = '.';
+					my_grid[i][k].old = '.';
+					my_grid[i][k].cur = '.';
 
 					printf("%c", my_grid[i][k].cur);
 				}

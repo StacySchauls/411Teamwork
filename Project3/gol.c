@@ -7,14 +7,14 @@ CELL **generateInitialGoL(int rank){
 	int rNum,i,k; // <-- potential error spot
 
 	CELL **my_grid = (CELL **)malloc((n/p)*sizeof(CELL*));
-	for(j = 0; j<(n/p); j++){
+	for(j = 0; j<(n/(p-1)); j++){
 		my_grid[j] = (CELL*)malloc(n*sizeof(CELL));
 		my_grid[j]->cur = 0;
 		my_grid[j]->old = '\0';
 	}
 	if(rank == 0){// master process 0
 		srand(time(NULL));
-		for(i=0;i<p;i++){//sending random number to each process
+		for(i=1;i<p;i++){//sending random number to each process
 			rNum = randNum();
 			MPI_Send(&rNum,1, MPI_INT, i, 0, MPI_COMM_WORLD);
 		}
@@ -23,7 +23,7 @@ CELL **generateInitialGoL(int rank){
 		printf("generateInitialGoL: rank %d\n", rank);
 		MPI_Recv(&rNum, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		srand(rNum);
-		for(i = 0; i<(n/p); i++){
+		for(i = 0; i<(n/(p-1)); i++){
 			printf("\n");
 			for(k = 0; k<n; k++){
 				generated_num = randNum();
@@ -250,7 +250,7 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	}
 	else{
 		// send to rank 0 
-		for (i = 0; i < n/p; i++){
+		for (i = 1; i < n/(p-1); i++){
 			for (j = 0; j < n; j++) {
 				buf[i*n + j] = grid[i][j].cur;
 			}

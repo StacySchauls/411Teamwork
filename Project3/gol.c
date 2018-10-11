@@ -52,8 +52,12 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 	memset(bufBelow, 0, n);
 	memset(bufAbove, 0, n);
 	if(rank == 0){
+		
+		printf("BARRIER1 in simulate: rank %d",rank);
 		MPI_Barrier(comm);
+		printf("BARRIER2 in simulate: rank %d",rank);
 		MPI_Barrier(comm);
+		printf("BARRIER3 in simulate: rank %d",rank);
 		MPI_Barrier(comm);
 	}else{
 
@@ -61,6 +65,7 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 			for(i = 0; i<n; i++){
 				buf[i] = grid[0][i].old;
 			}
+			printf("BARRIER1 in simulate: rank %d",rank);
 			MPI_Barrier(comm);
 			putchar('1');
 			if(rank != 1){
@@ -75,6 +80,7 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 			}else{
 				MPI_Recv(bufBelow, n, MPI_CHAR, rank+1, 0, comm, MPI_STATUS_IGNORE);
 			}
+			printf("BARRIER2 in simulate: rank %d",rank);
 			MPI_Barrier(comm);
 
 			putchar('3');
@@ -91,6 +97,7 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 				MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm, MPI_STATUS_IGNORE);
 			}
 
+			printf("BARRIER3 in simulate: rank %d",rank);
 			MPI_Barrier(comm);
 
 			putchar('5');

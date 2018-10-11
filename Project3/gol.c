@@ -57,48 +57,48 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 		MPI_Barrier(comm);
 	}else{
 
-	while (j < G){
-		for(i = 0; i<n; i++){
-			buf[i] = grid[0][i].old;
-		}
-		MPI_Barrier(comm);
-		putchar('1');
-		if(rank != 1){
-			MPI_Send(buf, n, MPI_CHAR, p-1,0,comm);
-		}else{
-			MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
-		}
+		while (j < G){
+			for(i = 0; i<n; i++){
+				buf[i] = grid[0][i].old;
+			}
+			MPI_Barrier(comm);
+			putchar('1');
+			if(rank != 1){
+				MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
+			}else{
+				MPI_Send(buf, n, MPI_CHAR, p-1,0,comm);
+			}
 
-		putchar('2');
-		if(rank == p-1){
-			MPI_Recv(bufBelow, n, MPI_CHAR, 1, 0, comm, MPI_STATUS_IGNORE);
-		}else{
-			MPI_Recv(bufBelow, n, MPI_CHAR, rank+1, 0, comm, MPI_STATUS_IGNORE);
-		}
-		MPI_Barrier(comm);
+			putchar('2');
+			if(rank == p-1){
+				MPI_Recv(bufBelow, n, MPI_CHAR, 1, 0, comm, MPI_STATUS_IGNORE);
+			}else{
+				MPI_Recv(bufBelow, n, MPI_CHAR, rank+1, 0, comm, MPI_STATUS_IGNORE);
+			}
+			MPI_Barrier(comm);
 
-		putchar('3');
-		if(rank == p-1){
-			MPI_Send(buf, n, MPI_CHAR, 1,0,comm);
-		}else{
-			MPI_Send(buf, n, MPI_CHAR, rank +1,0,comm);
-		}
+			putchar('3');
+			if(rank == p-1){
+				MPI_Send(buf, n, MPI_CHAR, 1,0,comm);
+			}else{
+				MPI_Send(buf, n, MPI_CHAR, rank +1,0,comm);
+			}
 
-		putchar('4');
-		if(rank == 1){
-			MPI_Recv(bufAbove, n, MPI_CHAR, p-1,0,comm, MPI_STATUS_IGNORE);
-		}else{
-			MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm, MPI_STATUS_IGNORE);
-		}
+			putchar('4');
+			if(rank == 1){
+				MPI_Recv(bufAbove, n, MPI_CHAR, p-1,0,comm, MPI_STATUS_IGNORE);
+			}else{
+				MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm, MPI_STATUS_IGNORE);
+			}
 
-		MPI_Barrier(comm);
+			MPI_Barrier(comm);
 
-		putchar('5');
-		determineState(grid,bufAbove,0);
-		for(i = 1; i<(n/p)-1; i++){
-			determineState(grid,bufBelow,i);
-		}
-		j++;
+			putchar('5');
+			determineState(grid,bufAbove,0);
+			for(i = 1; i<(n/p)-1; i++){
+				determineState(grid,bufBelow,i);
+			}
+			j++;
 		}
 	}
 	return 0;

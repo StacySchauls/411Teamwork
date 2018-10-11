@@ -100,13 +100,13 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 			MPI_Barrier(comm);
 
 			determineState(grid, rank,bufAbove,0);
-			for(i = 1; i<(n/p-1); i++){
+			for(i = 1; i<(n/(p-1)); i++){
 				determineState(grid,rank,bufBelow,i);
 			}
 			j++;
 		}
 	}
-	printf("Rank %d is exiting simulate.\n",rank);
+	printf("Rank %d is exiting simulate for row.\n",rank);
 	return 0;
 }
 
@@ -117,6 +117,7 @@ int determineState(CELL **grid, int rank, char buf[], int row){//updates a full 
 	int num_alive = 0, col = 0;
 	// count the number of neighbors with old alive
 	for (col = 0; col < n; col++) {
+		num_alive = 0;		
 		//set num_alive for each col value
 		//assuming in our grid
 		if(row == 0){
@@ -150,7 +151,7 @@ int determineState(CELL **grid, int rank, char buf[], int row){//updates a full 
 			if(grid[row][(col+1)%n].old == 'x'){
 				num_alive++;
 			}
-		}else if(row == (n/p)-1){//bottom row
+		}else if(row == (n/p)){//bottom row
 
 			//check Norths
 			if(grid[row-1][(col==0)?n-1:(col-1)].old == 'x'){
@@ -223,7 +224,7 @@ int determineState(CELL **grid, int rank, char buf[], int row){//updates a full 
 			grid[row][col].cur = DEAD;
 		}
 	}
-	printf("Rank %d is exiting DetermineState.\n",rank);
+	printf("Rank %d is exiting DetermineState For row %d.\n",rank,row);
 	return 0;
 }
 

@@ -30,12 +30,12 @@ CELL **generateInitialGoL(){
 
 					my_grid[i][k].old = my_grid[i][k].cur = ALIVE;// set both to alive
 					//printf("cell at [%d][%d] is %c\n",i,k, my_grid[i][k].cur);
-					printf("%c", my_grid[i][k].cur);
+					//printf("%c", my_grid[i][k].cur);
 				}else{
 
 					my_grid[i][k].old = my_grid[i][k].cur = DEAD;
 
-					printf("%c", my_grid[i][k].cur);
+					//printf("%c", my_grid[i][k].cur);
 				}
 			}
 		}
@@ -44,7 +44,7 @@ CELL **generateInitialGoL(){
 }
 
 int simulate(CELL **grid, MPI_Comm comm){
-
+	printf("in simulate: rank %d",rank);
 	int i, j = 0;
 	char buf[n], bufBelow[n], bufAbove[n];
 
@@ -56,12 +56,14 @@ int simulate(CELL **grid, MPI_Comm comm){
 			buf[i] = grid[0][i].old;
 		}
 		MPI_Barrier(comm);
+		putchar('1');
 		if(rank != 1){
-			MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
-		}else{
 			MPI_Send(buf, n, MPI_CHAR, p-1,0,comm);
+		}else{
+			MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
 		}
 
+		putchar('2');
 		if(rank == p-1){
 			MPI_Recv(bufBelow, n, MPI_CHAR, 1, 0, comm, MPI_STATUS_IGNORE);
 		}else{
@@ -69,12 +71,14 @@ int simulate(CELL **grid, MPI_Comm comm){
 		}
 		MPI_Barrier(comm);
 
+		putchar('3');
 		if(rank == p-1){
 			MPI_Send(buf, n, MPI_CHAR, 1,0,comm);
 		}else{
 			MPI_Send(buf, n, MPI_CHAR, rank +1,0,comm);
 		}
 
+		putchar('4');
 		if(rank == 1){
 			MPI_Recv(bufAbove, n, MPI_CHAR, p-1,0,comm, MPI_STATUS_IGNORE);
 		}else{
@@ -83,6 +87,7 @@ int simulate(CELL **grid, MPI_Comm comm){
 
 		MPI_Barrier(comm);
 
+		putchar('5');
 		determineState(grid,bufAbove,0);
 		for(i = 1; i<(n/p)-1; i++){
 			determineState(grid,bufBelow,i);
@@ -94,6 +99,7 @@ int simulate(CELL **grid, MPI_Comm comm){
 
 
 int determineState(CELL **grid, char buf[], int row){//updates a full row
+	printf("in determine state. Rank %d\n",rank);
 	int num_alive = 0, col = 0;
 	// count the number of neighbors with old alive
 

@@ -18,10 +18,10 @@ int main(int argc, char **argv){
 	if( (local_grid = generateInitialGoL() )){
 		//printf("init success\n");
 		simulate(local_grid, MPI_COMM_WORLD);
-		displayGoL(local_grid, MPI_COMM_WORLD);
 	}else {
 		printf("init failed\n");
 	}
+	displayGoL(local_grid, MPI_COMM_WORLD);
 	MPI_Finalize();
 
 	return 0;

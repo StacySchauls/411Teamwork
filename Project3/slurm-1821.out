@@ -1,0 +1,24 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+in simulate: rank 2rank: 2
+in simulate: rank 4rank: 4
+in simulate: rank 0rank: 0
+in simulate: rank 1rank: 1
+in simulate: rank 3rank: 3
+slurmd[n0000]: error: *** JOB 1821 CANCELLED AT 2018-10-10T17:33:50 ***
+mpirun: killing job...
+

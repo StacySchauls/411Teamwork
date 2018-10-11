@@ -9,8 +9,8 @@ CELL **generateInitialGoL(){
 	CELL **my_grid = (CELL **)malloc((n/p)*sizeof(CELL*));
 	for(j = 0; j<(n/p); j++){
 		my_grid[j] = (CELL*)malloc(n*sizeof(CELL));
-		grid[j]->cur = 0;
-		grid[j]->old = '\0';
+		my_grid[j]->cur = 0;
+		my_grid[j]->old = '\0';
 	}
 	if(rank == 0){// master process 0
 		srand(time(NULL));

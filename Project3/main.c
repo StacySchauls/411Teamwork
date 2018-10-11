@@ -1,8 +1,9 @@
 #include "gol.h"
 extern int n, G;     //#rows and #col  //# of generatioons
-extern int p, rank;   //number of processors and process id
+extern int p;   //number of processors and process id
 
 int main(int argc, char **argv){
+	int rank;
 	CELL **local_grid;
 	if(argc < 3){
 		printf("Not enough arguments.\n");
@@ -17,11 +18,11 @@ int main(int argc, char **argv){
 
 	if( (local_grid = generateInitialGoL() )){
 		//printf("init success\n");
-		simulate(local_grid, MPI_COMM_WORLD);
+		simulate(local_grid, MPI_COMM_WORLD, rank);
 	}else {
 		printf("init failed\n");
 	}
-	displayGoL(local_grid, MPI_COMM_WORLD);
+	displayGoL(local_grid, MPI_COMM_WORLD,rank);
 	MPI_Finalize();
 
 	return 0;

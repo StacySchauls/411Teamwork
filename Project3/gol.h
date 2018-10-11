@@ -29,9 +29,9 @@ typedef struct Cell{
 
 //function prototypes
 CELL **generateInitialGoL();
-int simulate(CELL **grid, MPI_Comm comm);
+int simulate(CELL **grid, MPI_Comm comm, int rank);
 int determineState(CELL **grid,char buf[],int row);
-int displayGoL(CELL **grid, MPI_Comm comm);
+int displayGoL(CELL **grid, MPI_Comm comm,int rank);
 int randNum();
 
 #endif //!GOL_H

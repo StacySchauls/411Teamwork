@@ -1,6 +1,6 @@
 #include "gol.h"
 extern int n, G;     //#rows and #col  //# of generatioons
-extern int p, rank;   //number of processors and process id
+extern int p;   //number of processors and process id
 
 CELL **generateInitialGoL(){
 	int j;
@@ -43,7 +43,7 @@ CELL **generateInitialGoL(){
 	return my_grid;
 }
 
-int simulate(CELL **grid, MPI_Comm comm){
+int simulate(CELL **grid, MPI_Comm comm, int rank){
 	printf("in simulate: rank %d",rank);
 	int i, j = 0;
 	char buf[n], bufBelow[n], bufAbove[n];
@@ -213,7 +213,7 @@ int determineState(CELL **grid, char buf[], int row){//updates a full row
 	return 0;
 }
 
-int displayGoL(CELL **grid, MPI_Comm comm){
+int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	int i = 0;
 	int j = 0;
 	int blocksize = (int)(((n*n)/(double)p) -1);

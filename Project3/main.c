@@ -16,7 +16,7 @@ int main(int argc, char **argv){
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 
 	if( (local_grid = generateInitialGoL() )){
-		printf("init success\n");
+		//printf("init success\n");
 		simulate(local_grid, MPI_COMM_WORLD);
 		displayGoL(local_grid, MPI_COMM_WORLD);
 	}else {

@@ -218,7 +218,7 @@ int displayGoL(CELL **grid, MPI_Comm comm){
 		for (i = 1; i < p-1; i++) {
 			MPI_Recv(buf, blocksize, MPI_CHAR, i, 0, comm, MPI_STATUS_IGNORE);
 			for (j = 0; j < blocksize; j++){
-				if (!j%n){
+				if (!j%n && j != 0){
 					putchar('\n');
 				}
 				putchar(buf[j]);

@@ -32,13 +32,13 @@ CELL **generateInitialGoL(int rank){
 					my_grid[i][k].old = 'x';
 					my_grid[i][k].cur = 'x';// set both to alive
 					//printf("cell at [%d][%d] is %c\n",i,k, my_grid[i][k].cur);
-					printf("%c", my_grid[i][k].cur);
+					//printf("%c", my_grid[i][k].cur);
 				}else{
 
 					my_grid[i][k].old = '.';
 					my_grid[i][k].cur = '.';
 
-					printf("%c", my_grid[i][k].cur);
+					//printf("%c", my_grid[i][k].cur);
 				}
 			}
 		}
@@ -55,13 +55,15 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 	memset(bufBelow, 0, n);
 	memset(bufAbove, 0, n);
 	if(rank == 0){
+		for(i = 0; i< G; i++){
 		
 		printf("BARRIER1 in simulate: rank %d\n",rank);
 		MPI_Barrier(comm);
 		printf("BARRIER2 in simulate: rank %d\n",rank);
 		MPI_Barrier(comm);
 		printf("BARRIER3 in simulate: rank %d\n",rank);
-		MPI_Barrier(comm);
+		MPI_Barrier(comm);}
+
 	}else{
 
 		while (j < G){
@@ -231,8 +233,9 @@ int determineState(CELL **grid, int rank, char buf[], int row){//updates a full 
 int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	int i = 0;
 	int j = 0;
-	int blocksize = (int)(((n*n)/(double)p) -1);
+	int blocksize = (int)(((n*n)/(double)(p-1)));
 	char buf[blocksize];
+	printf("%lu\n",sizeof(blocksize)/sizeof(int));
 	memset(buf, 0, blocksize);
 	printf("Rank %d at barrier in display \n", rank);
 	MPI_Barrier(comm);
@@ -242,10 +245,10 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 			printf("Rank %d is Receiving from %d \n",rank,i);
 			MPI_Recv(buf, blocksize, MPI_CHAR, i, 0, comm, MPI_STATUS_IGNORE);
 			for (j = 0; j < blocksize; j++){
-				if (!j%n && j != 0){
+				if (!(j%n) && j != 0){
 					putchar('\n');
 				}
-				//putchar(buf[j]);
+				putchar(buf[j]);
 			}
 		}
 	}

@@ -52,7 +52,9 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 	memset(bufBelow, 0, n);
 	memset(bufAbove, 0, n);
 	if(rank == 0){
-	MPI_Barrier(comm);
+		MPI_Barrier(comm);
+		MPI_Barrier(comm);
+		MPI_Barrier(comm);
 	}else{
 
 	while (j < G){

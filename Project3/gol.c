@@ -1,19 +1,17 @@
 #include "gol.h"
 extern int n, G;     //#rows and #col  //# of generatioons
 extern int p, rank;   //number of processors and process id
-extern CELL **grid, **nextGrid;
 
 CELL **generateInitialGoL(){
 	int j;
 	int rNum,i,k; // <-- potential error spot
+
 	CELL **my_grid = (CELL **)malloc((n/p)*sizeof(CELL*));
 	for(j = 0; j<(n/p); j++){
 		my_grid[j] = (CELL*)malloc(n*sizeof(CELL));
 		grid[j]->cur = 0;
 		grid[j]->old = '\0';
 	}
-
-
 	if(rank == 0){// master process 0
 		srand(time(NULL));
 		for(i=0;i<p;i++){//sending random number to each process
@@ -48,52 +46,52 @@ CELL **generateInitialGoL(){
 int simulate(CELL **grid, MPI_Comm comm){
 
 	int i, j = 0;
-	char buf[n],bufBelow[n],bufAbove[n];
+	char buf[n], bufBelow[n], bufAbove[n];
+
 	memset(buf, 0, n);
 	memset(bufBelow, 0, n);
 	memset(bufAbove, 0, n);
-	while(j < G){
+	while (j < G){
 		for(i = 0; i<n; i++){
 			buf[i] = grid[0][i].old;
-		}	
+		}
 		MPI_Barrier(comm);
 		if(rank != 1){
 			MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
-		}if else{
+		}else{
 			MPI_Send(buf, n, MPI_CHAR, p-1,0,comm);
 		}
 
 		if(rank == p-1){
-			MPI_Recv(bufBelow, n, MPI_CHAR, 1,0,comm);
+			MPI_Recv(bufBelow, n, MPI_CHAR, 1, 0, comm, MPI_STATUS_IGNORE);
 		}else{
-			MPI_Recv(bufBelow, n, MPI_CHAR, rank+1,0,comm);
+			MPI_Recv(bufBelow, n, MPI_CHAR, rank+1, 0, comm, MPI_STATUS_IGNORE);
 		}
-		MPI_Barrie(comm);
+		MPI_Barrier(comm);
 
 		if(rank == p-1){
 			MPI_Send(buf, n, MPI_CHAR, 1,0,comm);
-		}if else{
+		}else{
 			MPI_Send(buf, n, MPI_CHAR, rank +1,0,comm);
 		}
 
 		if(rank == 1){
-			MPI_Recv(bufAbove, n, MPI_CHAR, p-1,0,comm);
+			MPI_Recv(bufAbove, n, MPI_CHAR, p-1,0,comm, MPI_STATUS_IGNORE);
 		}else{
-			MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm);
+			MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm, MPI_STATUS_IGNORE);
 		}
 
 		MPI_Barrier(comm);
 
 		determineState(grid,bufAbove,0);
-		for(i = i; i<(n/p)-1; i++){
+		for(i = 1; i<(n/p)-1; i++){
 			determineState(grid,bufBelow,i);
 		}
 		j++;
 	}
-}	
-return 0;
-
+	return 0;
 }
+
 
 int determineState(CELL **grid, char buf[], int row){//updates a full row
 	int num_alive = 0, col = 0;
@@ -208,6 +206,37 @@ int determineState(CELL **grid, char buf[], int row){//updates a full row
 	}
 	return 0;
 }
+
+int displayGoL(CELL **grid, MPI_Comm comm){
+	int i = 0;
+	int j = 0;
+	int blocksize = (int)(((n*n)/(double)p) -1);
+	char buf[blocksize];
+	memset(buf, 0, blocksize);
+	if (rank == 0) {
+		//recieve and print from each other process in order
+		for (i = 1; i < p-1; i++) {
+			MPI_Recv(buf, blocksize, MPI_CHAR, i, 0, comm, MPI_STATUS_IGNORE);
+			for (j = 0; j < blocksize; j++){
+				if (!j%n){
+					putchar('\n');
+				}
+				putchar(buf[j]);
+			}
+		}
+	}
+	else{
+		// send to rank 0 
+		for (i = 0; i < n/p; i++){
+			for (j = 0; j < n; j++) {
+				buf[i*n + j] = grid[i][j].cur;
+			}
+		}
+		MPI_Send(buf, blocksize, MPI_CHAR, 0, 0, comm);
+	}
+	return 0;
+}
+
 int randNum(){
 	int i;
 	i = (rand() % BIG_PRIME) + 1;

@@ -15,6 +15,10 @@
 #define ALIVE 'x'
 #define BIG_PRIME 93377
 
+// GLOBALS
+int n, G;     //#rows and #col  //# of generatioons
+int p, rank;   //number of processors and process id
+
 //struct with 2 chars
 typedef struct Cell{
   char old;
@@ -25,15 +29,9 @@ typedef struct Cell{
 
 //function prototypes
 CELL **generateInitialGoL();
-int simulate();
-int displayGoL();
+int simulate(CELL **grid, MPI_Comm comm);
+int determineState(CELL **grid,char buf[],int row);
+int displayGoL(CELL **grid, MPI_Comm comm);
 int randNum();
-int simulate(CELL **grid);
-int determineState();
-void getStatesFromRank(char buf[], int sender, int caller);
-//global variables
-int n, G;     //#rows and #col  //# of generatioons
-int p, rank;   //number of processors and process id
-CELL **grid, **nextGrid;
 
 #endif //!GOL_H

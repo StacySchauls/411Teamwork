@@ -51,6 +51,10 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 	memset(buf, 0, n);
 	memset(bufBelow, 0, n);
 	memset(bufAbove, 0, n);
+	if(rank == 0){
+	MPI_Barrier(comm);
+	}else{
+
 	while (j < G){
 		for(i = 0; i<n; i++){
 			buf[i] = grid[0][i].old;
@@ -93,6 +97,7 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 			determineState(grid,bufBelow,i);
 		}
 		j++;
+		}
 	}
 	return 0;
 }
@@ -102,7 +107,6 @@ int determineState(CELL **grid, char buf[], int row){//updates a full row
 	printf("in determine state. Rank %d\n",rank);
 	int num_alive = 0, col = 0;
 	// count the number of neighbors with old alive
-
 	for (col = 0; col < n; col++) {
 		//set num_alive for each col value
 		//assuming in our grid

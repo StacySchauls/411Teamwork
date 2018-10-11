@@ -32,7 +32,7 @@ CELL **generateInitialGoL(int rank){
 					my_grid[i][k].old = 'x';
 					my_grid[i][k].cur = 'x';// set both to alive
 					//printf("cell at [%d][%d] is %c\n",i,k, my_grid[i][k].cur);
-					printf("%c\n", my_grid[i][k].cur);
+					printf("%c", my_grid[i][k].cur);
 				}else{
 
 					my_grid[i][k].old = '.';
@@ -100,19 +100,20 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 			MPI_Barrier(comm);
 
 			determineState(grid, rank,bufAbove,0);
-			printf("Here\n");
-			for(i = 1; i<(n/p)-1; i++){
+			for(i = 1; i<(n/p-1); i++){
 				determineState(grid,rank,bufBelow,i);
 			}
 			j++;
 		}
 	}
+	printf("Rank %d is exiting simulate.\n",rank);
 	return 0;
 }
 
 
 int determineState(CELL **grid, int rank, char buf[], int row){//updates a full row
 	printf("in determine state. Rank %d\n",rank);
+	printf("DETERMINESTATE rank: %d  Row %d\n",rank,row);
 	int num_alive = 0, col = 0;
 	// count the number of neighbors with old alive
 	for (col = 0; col < n; col++) {
@@ -222,6 +223,7 @@ int determineState(CELL **grid, int rank, char buf[], int row){//updates a full 
 			grid[row][col].cur = DEAD;
 		}
 	}
+	printf("Rank %d is exiting DetermineState.\n",rank);
 	return 0;
 }
 
@@ -231,6 +233,8 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	int blocksize = (int)(((n*n)/(double)p) -1);
 	char buf[blocksize];
 	memset(buf, 0, blocksize);
+	printf("Rank %d at barrier in display \n", rank);
+	MPI_Barrier(comm);
 	if (rank == 0) {
 		//recieve and print from each other process in order
 		for (i = 1; i < p-1; i++) {

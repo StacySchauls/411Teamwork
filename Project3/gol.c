@@ -216,6 +216,7 @@ int displayGoL(CELL **grid, MPI_Comm comm){
 	if (rank == 0) {
 		//recieve and print from each other process in order
 		for (i = 1; i < p-1; i++) {
+			printf("Receiving from %d \n",i);
 			MPI_Recv(buf, blocksize, MPI_CHAR, i, 0, comm, MPI_STATUS_IGNORE);
 			for (j = 0; j < blocksize; j++){
 				if (!j%n && j != 0){

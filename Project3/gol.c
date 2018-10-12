@@ -235,15 +235,15 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	int j = 0;
 	int blocksize = (int)(((n*n)/(p-1)));
 	char buf[blocksize];
-	printf("\n\n");
-//	printf("The blocksize is: (%d * %d) / %d = %d\n",n,n,p-1,blocksize);
+	//printf("\n\n");
+	//printf("The blocksize is: (%d * %d) / %d = %d\n",n,n,p-1,blocksize);
 	memset(buf, 0, blocksize);
 	//printf("Rank %d at barrier in display \n", rank);
 	MPI_Barrier(comm);
 	if (rank == 0) {
 		//recieve and print from each other process in order
 		for (i = 1; i < p-1; i++) {
-		//	printf("Rank %d is Receiving from %d \n",rank,i);
+			//printf("Rank %d is Receiving from %d \n",rank,i);
 			MPI_Recv(buf, blocksize, MPI_CHAR, i, 0, comm, MPI_STATUS_IGNORE);
 			for (j = 0; j < blocksize; j++){
 				if (!(j%n) && j != 0){
@@ -251,6 +251,7 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 				}
 				putchar(buf[j]);
 			}
+			putchar('\n');
 		}
 	}
 	else{

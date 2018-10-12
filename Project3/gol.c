@@ -24,7 +24,7 @@ CELL **generateInitialGoL(int rank){
 		MPI_Recv(&rNum, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		srand(rNum);
 		for(i = 0; i<(n/(p-1)); i++){
-			printf("\n");
+			//	printf("\n");
 			for(k = 0; k<n; k++){
 				generated_num = randNum();
 				if(generated_num %2 == 0){
@@ -32,13 +32,13 @@ CELL **generateInitialGoL(int rank){
 					my_grid[i][k].old = 'x';
 					my_grid[i][k].cur = 'x';// set both to alive
 					//printf("cell at [%d][%d] is %c\n",i,k, my_grid[i][k].cur);
-					printf("%c", my_grid[i][k].cur);
+					//printf("%c", my_grid[i][k].cur);
 				}else{
 
 					my_grid[i][k].old = '.';
 					my_grid[i][k].cur = '.';
 
-					printf("%c", my_grid[i][k].cur);
+					//printf("%c", my_grid[i][k].cur);
 				}
 			}
 		}
@@ -235,7 +235,10 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	int j = 0;
 	int blocksize = (int)(((n*n)/(p-1)));
 	char buf[blocksize];
-	//printf("\n\n");
+	if(rank == 0){
+
+		printf("\n\n");
+	}
 	//printf("The blocksize is: (%d * %d) / %d = %d\n",n,n,p-1,blocksize);
 	memset(buf, 0, blocksize);
 	//printf("Rank %d at barrier in display \n", rank);

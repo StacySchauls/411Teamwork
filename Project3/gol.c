@@ -52,6 +52,9 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 	int i, j = 0;
 	Runtime sim_time;
 	Runtime gen_time;
+	Runtime blah_time;
+
+	int blah_time_time =NULL;
 	char buf[n], bufBelow[n], bufAbove[n];
 	gettimeofday(&sim_time.t1, NULL);
 	memset(buf, 0, n);
@@ -59,13 +62,13 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 	memset(bufAbove, 0, n);
 	if(rank == 0){
 		for(i = 0; i< G; i++){
-		
-		//printf("BARRIER1 in simulate: rank %d\n",rank);
-		MPI_Barrier(comm);
-		//printf("BARRIER2 in simulate: rank %d\n",rank);
-		MPI_Barrier(comm);
-		//printf("BARRIER3 in simulate: rank %d\n",rank);
-		MPI_Barrier(comm);}
+
+			//printf("BARRIER1 in simulate: rank %d\n",rank);
+			MPI_Barrier(comm);
+			//printf("BARRIER2 in simulate: rank %d\n",rank);
+			MPI_Barrier(comm);
+			//printf("BARRIER3 in simulate: rank %d\n",rank);
+			MPI_Barrier(comm);}
 
 	}else{
 
@@ -110,11 +113,30 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 				determineState(grid,rank,bufBelow,i);
 			}
 			j++;
+			gettimeofday(&gen_time.t2, NULL);
+			gettimeofday(&blah_time.t1,NULL);
+			int gen_avg = timeToMicroSec(&gen_time);
+			int *gen_avgs = NULL;
+			if (rank == 0){
+				gen_avgs = (int*)malloc(sizeof(int) *G);
+			}
+			else{
+				MPI_Gather(&gen_avg, 1, MPI_INT, gen_avgs, 1 , MPI_INT, 0, comm);
+			}
+			if (rank == 0){
+				int sum = 0;
+				for (i = 0; i < p; i++){
+					sum += gen_avgs[i];
+				}
+				gen_avg = (int)(sum/(double)G);
+			}
+			gettimeofday(&blah_time.t2,NULL);
+			blah_time_time = timeToMicroSec(&blah_time);
 		}
 	}
 	//printf("Rank %d is exiting simulate for row.\n",rank);
 	gettimeofday(&sim_time.t2, NULL);
-	int sim_avg = timeToMicroSec(&sim_time);
+	int sim_avg = timeToMicroSec(&sim_time) - blah_time_time;
 	int * sim_avgs = NULL;
 	if (rank == 0){
 		sim_avgs = (int*)malloc(sizeof(int) *p);
@@ -128,8 +150,9 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 			sum += sim_avgs[i];
 		}
 		sim_avg = (int)(sum/(double)p);
+		printf("SIM AVG: %d\n",sim_avg);
 	}
-	
+
 	return 0;
 }
 

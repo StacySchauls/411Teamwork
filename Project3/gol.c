@@ -114,7 +114,7 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 			}
 			j++;
 			gettimeofday(&gen_time.t2, NULL);
-			gettimeofday(&blah_time.t1,NULL);
+			/*gettimeofday(&blah_time.t1,NULL);
 			int gen_avg = timeToMicroSec(&gen_time);
 			int *gen_avgs = NULL;
 			if (rank == 0){
@@ -131,26 +131,31 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 				gen_avg = (int)(sum/(double)G);
 			}
 			gettimeofday(&blah_time.t2,NULL);
-			blah_time_time = timeToMicroSec(&blah_time);
+			blah_time_time = timeToMicroSec(&blah_time);*/
 		}
 	}
 	//printf("Rank %d is exiting simulate for row.\n",rank);
 	gettimeofday(&sim_time.t2, NULL);
-	int sim_avg = timeToMicroSec(&sim_time) - blah_time_time;
+	int sim_avg = timeToMicroSec(&sim_time);
 	int * sim_avgs = NULL;
 	if (rank == 0){
 		sim_avgs = (int*)malloc(sizeof(int) *p);
 	}
-	else{
+	//simavg
+//	printf("%d,",sim_avg);
 		MPI_Gather(&sim_avg, 1, MPI_INT, sim_avgs, 1 , MPI_INT, 0, comm);
-	}
 	if (rank == 0){
+		
 		int sum = 0;
+		int *start;
+		start = sim_avgs;
 		for (i = 0; i < p; i++){
-			sum += sim_avgs[i];
+		//	printf("%d,",i,*start);
+			sum += *start;
+			start++;
 		}
 		sim_avg = (int)(sum/(double)p);
-		printf("SIM AVG: %d\n",sim_avg);
+		printf("%d,%d,%d,%d",sim_avg,n,G,p);
 	}
 
 	return 0;
@@ -283,7 +288,7 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	char buf[blocksize];
 	if(rank == 0){
 
-		printf("\n\n");
+		//printf("\n\n");
 	}
 	//printf("The blocksize is: (%d * %d) / %d = %d\n",n,n,p-1,blocksize);
 	memset(buf, 0, blocksize);
@@ -296,11 +301,11 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 			MPI_Recv(buf, blocksize, MPI_CHAR, i, 0, comm, MPI_STATUS_IGNORE);
 			for (j = 0; j < blocksize; j++){
 				if (!(j%n) && j != 0){
-					putchar('\n');
+		//			putchar('\n');
 				}
-				putchar(buf[j]);
+		//		putchar(buf[j]);
 			}
-			putchar('\n');
+		//	putchar('\n');
 		}
 	}
 	else{

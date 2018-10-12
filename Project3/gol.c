@@ -1,4 +1,5 @@
 #include "gol.h"
+#include "util.h"
 extern int n, G;     //#rows and #col  //# of generatioons
 extern int p;   //number of processors and process id
 
@@ -49,8 +50,10 @@ CELL **generateInitialGoL(int rank){
 int simulate(CELL **grid, MPI_Comm comm, int rank){
 
 	int i, j = 0;
+	Runtime sim_time;
+	Runtime gen_time;
 	char buf[n], bufBelow[n], bufAbove[n];
-
+	gettimeofday(&sim_time.t1, NULL);
 	memset(buf, 0, n);
 	memset(bufBelow, 0, n);
 	memset(bufAbove, 0, n);
@@ -67,6 +70,7 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 	}else{
 
 		while (j < G){
+			gettimeofday(&gen_time.t1, NULL);
 			for(i = 0; i<n; i++){
 				buf[i] = grid[0][i].old;
 			}
@@ -109,8 +113,27 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 		}
 	}
 	//printf("Rank %d is exiting simulate for row.\n",rank);
+	gettimeofday(&sim_time.t2, NULL);
+	int sim_avg = timeToMicroSec(&sim_time);
+	int * sim_avgs = NULL;
+	if (rank == 0){
+		sim_avgs = (int*)malloc(sizeof(int) *p);
+	}
+	else{
+		MPI_Gather(&sim_avg, 1, MPI_INT, sim_avgs, 1 , MPI_INT, 0, comm);
+	}
+	if (rank == 0){
+		int sum = 0;
+		for (i = 0; i < p; i++){
+			sum += sim_avgs[i];
+		}
+		sim_avg = (int)(sum/(double)p);
+	}
+	
 	return 0;
 }
+
+
 
 
 int determineState(CELL **grid, int rank, char buf[], int row){//updates a full row

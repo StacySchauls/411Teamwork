@@ -1,4 +1,6 @@
 #include "gol.h"
+#include "util.h"
+
 extern int n, G;     //#rows and #col  //# of generatioons
 extern int p;   //number of processors and process id
 

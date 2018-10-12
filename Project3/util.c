@@ -13,9 +13,9 @@ int *generateInput(int n){
 	return seq;
 }
 int timeToMicroSec(Runtime *r){
-	return (r->t2.tv_sec-r->t1.tv_sec) + (r->t2.tv_usec-r->t1.tv_usec);
+	return (r->t2.tv_sec-r->t1.tv_sec) * 1000000 + (r->t2.tv_usec-r->t1.tv_usec);
 }
-int sendMBytes(int rank, int p, int m, Runtime *s){
+int sendMBytes(int m, Runtime *s){
 	char *x = (char*)malloc(m * sizeof(char));//buffer for sending
 	int dest = 0;
 	gettimeofday(&s->t1, NULL);
@@ -28,7 +28,7 @@ int sendMBytes(int rank, int p, int m, Runtime *s){
 	return tSend;
 }
 
-int recvMBytes(int rank, int p, int m, Runtime *r){
+int recvMBytes(int m, Runtime *r){
 	char *y = (char*)calloc(m, sizeof(char));
 	MPI_Status status;
 	gettimeofday(&r->t1,NULL);

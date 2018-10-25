@@ -4,4 +4,4 @@
 
 
 int *serial_baseline(int n, int A, int B, int P, int output[]);
-int *serian_matrix(int n);
+int *serial_matrix(int n, int A, int B, int P, int output[]);

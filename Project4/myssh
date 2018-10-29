@@ -1,0 +1,5 @@
+#!/usr/bin/expect
+spawn ssh stacy.schauls@pleiades.tricity.wsu.edu
+expect "password:"
+send "#INT3LP0W3r!\r"
+interact

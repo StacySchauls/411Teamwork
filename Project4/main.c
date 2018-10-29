@@ -11,5 +11,8 @@ int main(int argc, char *argv[]){
 	serial_baseline(n,A,B,P, arr);
 	putchar(10);
 	serial_matrix(n,A,B,P, arr);
+  load_input(argc, argv);
+gen_random();
+MPI_Finalize();
 	return 0;
 }

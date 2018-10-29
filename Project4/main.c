@@ -5,13 +5,14 @@
 extern int rank;
 extern int seed, A, p, B, n;
 extern int big_prime;
+
 int main(int argc, char *argv[]){
-	int arr[n];
 	clock_t p_diff;
 	clock_t c_start;
 	clock_t c_diff = 0;
 	clock_t p_start = clock();
 	load_input(argc, argv);
+	int *arr = (int*)malloc(n*sizeof(int));
 	memset(arr, 0, n);
 	if(rank == 0){
 		c_start = clock();
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]){
 	p_diff = clock()-p_start - c_diff;
 	p_diff = p_diff * 1000000 / CLOCKS_PER_SEC;
 	c_diff = c_diff * 1000000 / CLOCKS_PER_SEC;
-	printf("the timeing s: parallel= %d, cereal = %d\n",(int) p_diff/1000000,(int) c_diff/1000000);
 	MPI_Finalize();
+	printf("the timeing s: parallel= %d, cereal = %d\n",(int) p_diff/1000000,(int) c_diff/1000000);
 	return 0;
 }

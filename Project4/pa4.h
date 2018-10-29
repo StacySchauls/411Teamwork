@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 #include <mpi.h>
 int rank;
 int seed, A, p, B, n;

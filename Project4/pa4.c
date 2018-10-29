@@ -7,13 +7,13 @@ extern int big_prime;
 
 int *serial_baseline(int output[]){
 	//int seed = 909;
-	printf("A B : %d %d \n",A, B);
+//	printf("A B : %d %d \n",A, B);
 	int i = 0;
 	output[0] = seed;
-	printf("serial[0] : %d \n", seed);
+//	printf("serial[0] : %d \n", seed);
 	for(i = 1; i<n; i++){
 		output[i] = (A* (output[i-1] ) + B )% big_prime;
-		printf("serial[%d] : %d \n", i, output[i]);
+	//	printf("serial[%d] : %d \n", i, output[i]);
 	}
 
 	return output;
@@ -27,12 +27,12 @@ void serial_matrix1(int output[], int N, int Mo[2][2]){
 	int tA = Mo[0][0], tB = Mo[1][0];
 	
 
-	printf("matrix[0] : %d \n", seed);
+//	printf("matrix[0] : %d \n", seed);
 	for(i = 0; i<N-1; i++){
 		//calculate our matrix to the i-th power
 		output[i] = (tA* seed + tB )% big_prime;
-		printf("[%d, 0]\n[%d, 1] rank: %d \n\n", tA,tB,rank);
-		printf("matrix[%d] : %d rank %d \n\n", i, output[i],rank);
+	//	printf("[%d, 0]\n[%d, 1] rank: %d \n\n", tA,tB,rank);
+	//	printf("matrix[%d] : %d rank %d \n\n", i, output[i],rank);
 		tA = tA*A + 0;
 		tB = tB*A + B;
 	}

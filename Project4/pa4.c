@@ -21,7 +21,7 @@ int *serial_baseline(int output[]){
 
 
 
-void *serial_matrix1(int N, int Mo[2][2]){
+void serial_matrix1(int N, int Mo[2][2]){
 	int i = 0;
 	long long int tA = Mo[0][0], tB = Mo[1][0];
 	int output[N];
@@ -35,7 +35,6 @@ void *serial_matrix1(int N, int Mo[2][2]){
 		tA = tA*A + 0;
 		tB = tB*A + B;
 	}
-
 }
 /*int *serial_matrix(int n, int A, int B, int P, int output[]){
 	int seed = 909;
@@ -58,24 +57,26 @@ void *serial_matrix1(int N, int Mo[2][2]){
 
 
 //g gp does not change outside of the file
-void parallel_prefix(int Mo, int * Ml[2][2]){
+void parallel_prefix(int Mo[2][2], int * Ml){
 	int l[2][2];
 	int g[2][2];
-	int gp[2][2]; 
+	int *gp = NULL;
 	int v = 1, t = 1, mate = 0;
 	double var = log2((double) p);
-	memcpy(l, Ml[(n/p) -1], sizeof(l));
-	memcpy(g, Ml[(n/p) -1], sizeof(g));
+	memcpy(l, Ml+((n/p) -1), sizeof(l));
+	memcpy(g, Ml+((n/p) -1), sizeof(g));
 	for(t = 0; t <var - 1 ; t++){
 		mate = rank ^ v;
 		v = v <<  1;
-		MPI_Send(g, 1, MPI_INT, mate, 0, MPI_COMM_WORLD);
-		MPI_Recv(gp, 1, MPI_INT, mate, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		x_circle(g, gp);
+		MPI_Send(g, 4, MPI_INT, mate, 0, MPI_COMM_WORLD);//MIGHT BREAK
+		MPI_Recv(gp, 4, MPI_INT, mate, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
 		//g += gp;
-		if(mate<rank)
+		x_circle(g, gp);
+		if(mate<rank){
+			// l+=gp;
 			x_circle(l, gp);
-		// l+=gp;
+		}
 	}
 	memcpy(Mo, l, sizeof(l));
 }
@@ -85,7 +86,6 @@ void load_input(int argc, char *argv[]){
 		printf("Usage: \n Must have 4 arguments: n, Seed, A, B,<BIG_PRIME> ");
 		exit(-1);
 	}
-	int i;
 	MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &p);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -100,9 +100,9 @@ void load_input(int argc, char *argv[]){
 	B = atoi(argv[4]);
 
 	if(argc == 5){
-		BIG_PRIME = atoi(argv[5]);
+		big_prime = atoi(argv[5]);
 	}else{
-		BIG_PRIME = 27211
+		big_prime = 997;
 	}
 
 }
@@ -115,34 +115,34 @@ int *gen_random(void){
 	int Mo[2][2];
 	int i;
 	//step 2: populate local xl
-	int ***xl = (int***) malloc(n/p* sizeof(int[2][2]));
+	int *xl = (int*) malloc(n/p* sizeof(int[2][2]));
 	for(i = 0; i < n/p; i++){
-		memcpy(xl[i], M, sizeof(M));
+		memcpy(xl + (i* sizeof(int[2][2])), M, sizeof(M));
 	}
 
 	if(rank == 0)
-		memcpy(xl[0],Mp, sizeof(Mp));
+		memcpy(xl,Mp, sizeof(Mp));
 
 	//step 3 calculate Mlocal
 
 	memcpy(Mp, Ml, sizeof(Mp));
 	for(i = 0; i < (n/p) -1; i++){
 		//multiply matricies
-		x_circle(Ml, xl +(i*sizeof(int [2][2])));
-		memcpy(xl[i], Ml, sizeof(Ml));
+		x_circle(Ml, xl + (i* sizeof(int[2][2])));
+		memcpy(xl + (i* sizeof(int[2][2])), Ml, sizeof(Ml));
 	}
 	//step 4
 	parallel_prefix(Mo, xl);
 
-
+	return 0;
 }
 
 
-void x_circle(int d[2][2], int m[2][2]){
+void x_circle(int d[2][2], int *m){
 	int t[2][2];
 	memcpy(t, d, sizeof(int[2][2]));
-	d[0][0] = t[0][0] * m[0][0] + t[0][1] * m[1][0];
-	d[0][1] = t[0][0] * m[0][1] + t[0][1] * m[1][1];
-	d[1][0] = t[1][0] * m[0][0] + t[1][1] * m[1][0];
-	d[1][1] = t[1][0] * m[0][1] + t[1][1] * m[1][1];
+	d[0][0] = t[0][0] * *m     + t[0][1] * *(m+2);
+	d[0][1] = t[0][0] * *(m+1) + t[0][1] * *(m+3);
+	d[1][0] = t[1][0] * *m     + t[1][1] * *(m+2);
+	d[1][1] = t[1][0] * *(m+1) + t[1][1] * *(m+3);
 }

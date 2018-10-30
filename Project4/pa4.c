@@ -138,9 +138,10 @@ void gen_random(int array[]){
 	memcpy(Ml, Mp, sizeof(Mp));
 	for(i = 0; i < (n/p) -1; i++){
 		//multiply matricies
-		//printf("Ml: { {%d, %d}, {%d, %d} }\n",ML[0][0], d[0][1], d[1][0], d[1][1]);
 		x_circle(Ml, xl + (i* sizeof(int[2][2])));
 		memcpy(xl + (i* sizeof(int[2][2])), Ml, sizeof(Ml));
+		
+		printf("Ml: { {%d, %d}, {%d, %d} }\n",Ml[0][0], Ml[0][1], Ml[1][0], Ml[1][1]);
 	}
 	//step 4
 	parallel_prefix(Mo, xl);
@@ -154,12 +155,12 @@ void x_circle(int d[2][2], int *m){
 	int t[2][2];
 	memcpy(t, d, sizeof(int[2][2]));
 	
-	printf("m: { {%d, %d}, {%d, %d} }\n",*m, *(m+1), *(m+2), *(m+3));
+	//printf("m: { {%d, %d}, {%d, %d} }\n",*m, *(m+1), *(m+2), *(m+3));
 
 	d[0][0] = t[0][0] * *m     + t[0][1] * *(m+2);
 	d[0][1] = t[0][0] * *(m+1) + t[0][1] * *(m+3);
 	d[1][0] = t[1][0] * *m     + t[1][1] * *(m+2);
 	d[1][1] = t[1][0] * *(m+1) + t[1][1] * *(m+3);
-}
 	printf("d: { {%d, %d}, {%d, %d} }\n",d[0][0], d[0][1], d[1][0], d[1][1]);
 	printf("t: { {%d, %d}, {%d, %d} }\n",t[0][0], t[0][1], t[1][0], t[1][1]);
+}

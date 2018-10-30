@@ -70,6 +70,8 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 	int *gp = (int *)malloc(sizeof(int[2][2]));
 	int *gt = (int *)malloc(sizeof(int[2][2]));
 	int v = 1, t = 1, mate = 0;
+	printf("\n\n- - - - - - - - - - - - - - - - - - - - - - - - -\n");
+	printf("Starting parallel_prefix, rank = %d\n", rank);
 	
 	double var = log( (double) p) / log(2);
 	memcpy(l, Ml+((n/p) -1), sizeof(l));
@@ -88,8 +90,11 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 			x_circle(l, gp);
 		}
 	}
+	printf("l: { {%d, %d}, {%d, %d} }\n",l[0][0], l[0][1], l[1][0], l[1][1]);
 	memcpy(Mo, l, sizeof(l));
 	free(gp);
+	printf("Exiting parallel_prefix, rank = %d\n", rank);
+	printf("- - - - - - - - - - - - - - - - - - - - - - - - -\n");
 }
 
 void load_input(int argc, char *argv[]){

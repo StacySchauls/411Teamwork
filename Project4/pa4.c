@@ -35,8 +35,8 @@ void serial_matrix1(int output[], int N, int Mo[2][2]){
 		//printf("i is : %d\n", i);
 		//calculate our matrix to the i-th power
 		output[i] = (tA* seed + tB )% big_prime;
-	//	printf("[%d, 0]\n[%d, 1] rank: %d \n\n", tA,tB,rank);
-		printf("matrix[%d] : %lld rank %d \n\n", i,(long long) output[i],rank);
+		printf("TA : [%lld, 0]\nTB: [%lld, 1] rank: %d \n\n", tA,tB,rank);
+		//printf("matrix[%d] : %lld rank %d \n\n", i,(long long) output[i],rank);
 		tA = tA*A + 0;
 		tB = tB*A + B;
 	}
@@ -76,12 +76,13 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 	printf("Starting parallel_prefix, rank = %d\n", rank);
 	*/
 	double var = log( (double) p) / log(2);
-	memcpy(l, Ml, sizeof(l));
-	memcpy(g, Ml, sizeof(g));
-	/*
+	printf("%f\n", var);
+	memcpy(l, Ml + (4 * (n/p -1)) , sizeof(l));
+	memcpy(g, Ml + (4 * (n/p -1)) , sizeof(g));
+	
 	printf("g: { {%d, %d}, {%d, %d} }\n",g[0][0], g[0][1], g[1][0], g[1][1]);
 	printf("l: { {%d, %d}, {%d, %d} }\n",l[0][0], l[0][1], l[1][0], l[1][1]);
-	*/
+	
 	for(t = 0; t <var - 1 ; t++){
 		mate = rank ^ v;
 		v = v <<  1;
@@ -147,7 +148,9 @@ void gen_random(int array[]){
 	int *xl = (int*) malloc((n/p) * sizeof(int[2][2]));
 	for(i = 0; i < n/p; i++){
 		//printf("in here okay %d \n", i);
-		memcpy(xl + (i* sizeof(int[2][2])), M, sizeof(M));
+		//memcpy(xl + (i* sizeof(int[2][2])), M, sizeof(M));
+		memcpy(xl + (i* 4), M, sizeof(M));
+		printf("%d, %d, %d, %d\n",*(xl + (i*4)),*(xl + (i*4)+1),*(xl + (i*4)+2),*(xl + (i*4)+3));
 	}
 	//printf("yay we are out\n");
 	if(rank == 0)
@@ -156,15 +159,15 @@ void gen_random(int array[]){
 	//step 3 calculate Mlocal
 
 	memcpy(Ml, Mp, sizeof(Mp));
-	for(i = 0; i < (n/p) -1; i++){
+	for(i = 0; i < (n/p); i++){
 		//multiply matricies
-		x_circle(Ml, xl + (i* sizeof(int[2][2])));
-		memcpy(xl + (i* sizeof(int[2][2])), Ml, sizeof(Ml));
+		x_circle(Ml, xl + (i*4));
+		memcpy(xl + (i* 4), Ml, sizeof(Ml));
 		
 //		printf("Ml: { {%d, %d}, {%d, %d} }\n",Ml[0][0], Ml[0][1], Ml[1][0], Ml[1][1]);
 	}
 	//step 4
-	parallel_prefix(Mo, xl);
+	parallel_prefix(Mo,xl);
 	
 	//step 5
 	serial_matrix1(array, n/p, Mo);

@@ -294,7 +294,7 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	memset(buf, 0, blocksize);
 	//printf("Rank %d at barrier in display \n", rank);
 	MPI_Barrier(comm);
-	if (rank == 0) {
+	/*if (rank == 0) {
 		//recieve and print from each other process in order
 		for (i = 1; i < p-1; i++) {
 			//printf("Rank %d is Receiving from %d \n",rank,i);
@@ -317,6 +317,7 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 		}
 		MPI_Send(buf, blocksize, MPI_CHAR, 0, 0, comm);
 	}
+	*/
 	return 0;
 }
 

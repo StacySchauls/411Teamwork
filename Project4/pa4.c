@@ -25,11 +25,10 @@ int *serial_baseline(int output[]){
 void serial_matrix1(int output[], int N, int Mo[2][2]){
 	int i = 0;
 	long long tA = Mo[0][0], tB = Mo[1][0];
-	/*
+	
 	printf("\n\n- - - - - - - - - - - - - - - - - - - - - - - - -\n");
 	printf("Starting serial_matrix1, rank = %d\n", rank);
 	printf("Mo: { {%d, %d}, {%d, %d} }\n",Mo[0][0], Mo[0][1], Mo[1][0], Mo[1][1]);
-	*/
 	//printf("N is %d\n", N);
 	//printf("matrix[0] : %d \n", seed);
 	for(i = 0; i<N; i++){
@@ -41,10 +40,8 @@ void serial_matrix1(int output[], int N, int Mo[2][2]){
 		tA = tA*A + 0;
 		tB = tB*A + B;
 	}
-	/*
 	printf("Exiting serial_matrix1, rank = %d\n", rank);
 	printf("- - - - - - - - - - - - - - - - - - - - - - - - -\n");
-	*/
 }
 
 /*int *serial_matrix(int n, int A, int B, int P, int output[]){

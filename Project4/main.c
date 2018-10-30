@@ -39,8 +39,10 @@ int main(int argc, char *argv[]){
 	c_diff = c_diff * 1000000 / CLOCKS_PER_SEC;
 
 	printf("the timeing s: parallel= %d, cereal = %d\n",(int) p_diff/1000000,(int) c_diff/1000000);
-	for (i = 0; i < n; i++){
-		printf("Random[%d] = %d\n", i, *(arr + i));
+	if (rank == 0){
+		for (i = 0; i < n; i++){
+			printf("Random[%d] = %d\n", i, *(arr + i));
+		}
 	}
 	MPI_Finalize();
 	return 0;

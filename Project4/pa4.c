@@ -115,22 +115,22 @@ void load_input(int argc, char *argv[]){
 
 }
 
-int *gen_random(void){
+int *gen_random(int array[]){
 	//step 1
 	int M[2][2] = { { A, 0}, {B, 1}};
 	int Mp[2][2] = { { 1, 0}, {0, 1}};
 	int Ml[2][2];
 	int Mo[2][2];
 	int i;
-	int *array = (int *) malloc(n/p * sizeof(int));
+
 	memset(array, 0 , sizeof((n/p) * sizeof(int)));
 	//step 2: populate local xl
 	int *xl = (int*) malloc((n/p) * sizeof(int[2][2]));
 	for(i = 0; i < n/p; i++){
-		printf("in here okay %d \n", i);
+		//printf("in here okay %d \n", i);
 		memcpy(xl + (i* sizeof(int[2][2])), M, sizeof(M));
 	}
-	printf("yay we are out\n");
+	//printf("yay we are out\n");
 	if(rank == 0)
 		memcpy(xl,Mp, sizeof(Mp));
 
@@ -142,13 +142,12 @@ int *gen_random(void){
 		x_circle(Ml, xl + (i* sizeof(int[2][2])));
 		memcpy(xl + (i* sizeof(int[2][2])), Ml, sizeof(Ml));
 	}
-//step 4
+	//step 4
 	parallel_prefix(Mo, xl);
 	
 	//step 5
 	serial_matrix1(array, n/p, Mo);
 
-	printf("kdkhdhaadshhdasjfhdajkhfajhfaksjfhdjsfhjkfja\n");
 	return 0;
 }
 
@@ -157,6 +156,10 @@ void x_circle(int d[2][2], int *m){
 	int t[2][2];
 	memcpy(t, d, sizeof(int[2][2]));
 	
+	printf("d: { {%d, %d}, {%d, %d} }\n",d[0][0], d[0][1], d[1][0], d[1][1]);
+	printf("t: { {%d, %d}, {%d, %d} }\n",t[0][0], t[0][1], t[1][0], t[1][1]);
+	printf("m: { {%d, %d}, {%d, %d} }\n",*m, *(m+1), *(m+2), *(m+3));
+
 	d[0][0] = t[0][0] * *m     + t[0][1] * *(m+2);
 	d[0][1] = t[0][0] * *(m+1) + t[0][1] * *(m+3);
 	d[1][0] = t[1][0] * *m     + t[1][1] * *(m+2);

@@ -26,10 +26,13 @@ void serial_matrix1(int output[], int N, int Mo[2][2]){
 	int i = 0;
 	long long tA = Mo[0][0], tB = Mo[1][0];
 	
-	printf("N is %d\n", N);
-//	printf("matrix[0] : %d \n", seed);
+	printf("\n\n- - - - - - - - - - - - - - - - - - - - - - - - -\n");
+	printf("Starting serial_matrix1, rank = %d\n", rank);
+	printf("Mo: { {%d, %d}, {%d, %d} }\n",Mo[0][0], Mo[0][1], Mo[1][0], Mo[1][1]);
+	//printf("N is %d\n", N);
+	//printf("matrix[0] : %d \n", seed);
 	for(i = 0; i<N; i++){
-		printf("i is : %d\n", i);
+		//printf("i is : %d\n", i);
 		//calculate our matrix to the i-th power
 		output[i] = (tA* seed + tB )% big_prime;
 	//	printf("[%d, 0]\n[%d, 1] rank: %d \n\n", tA,tB,rank);
@@ -37,6 +40,8 @@ void serial_matrix1(int output[], int N, int Mo[2][2]){
 		tA = tA*A + 0;
 		tB = tB*A + B;
 	}
+	printf("Exiting serial_matrix1, rank = %d\n", rank);
+	printf("- - - - - - - - - - - - - - - - - - - - - - - - -\n");
 }
 /*int *serial_matrix(int n, int A, int B, int P, int output[]){
 	int seed = 909;

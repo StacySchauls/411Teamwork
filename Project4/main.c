@@ -7,6 +7,7 @@ extern int seed, A, p, B, n;
 extern int big_prime;
 
 int main(int argc, char *argv[]){
+	int i;
 	clock_t p_diff;
 	clock_t c_start;
 	clock_t c_diff = 0;
@@ -27,10 +28,20 @@ int main(int argc, char *argv[]){
 	
 	//Each RANK generates a random array
 	gen_random(arr);
+	if (rank == 0){
+		MPI_Gather(arr, n/p -1, MPI_INT, arr, n/p -1, MPI_INT, 0, MPI_COMM_WORLD);
+	}
+	else{
+		MPI_Gather(arr, n/p -1, MPI_INT, NULL, n/p -1, MPI_INT, 0, MPI_COMM_WORLD);
+	}
 	p_diff = clock()-p_start - c_diff;
 	p_diff = p_diff * 1000000 / CLOCKS_PER_SEC;
 	c_diff = c_diff * 1000000 / CLOCKS_PER_SEC;
+
 	printf("the timeing s: parallel= %d, cereal = %d\n",(int) p_diff/1000000,(int) c_diff/1000000);
+	for (i = 0; i < n; i++){
+		printf("Random[%d] = %d\n", i, *(arr + i));
+	}
 	MPI_Finalize();
 	return 0;
 }

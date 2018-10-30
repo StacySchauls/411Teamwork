@@ -76,6 +76,8 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 	double var = log( (double) p) / log(2);
 	memcpy(l, Ml+((n/p) -1), sizeof(l));
 	memcpy(g, Ml+((n/p) -1), sizeof(g));
+	printf("g: { {%d, %d}, {%d, %d} }\n",g[0][0], g[0][1], g[1][0], g[1][1]);
+	printf("l: { {%d, %d}, {%d, %d} }\n",l[0][0], l[0][1], l[1][0], l[1][1]);
 	for(t = 0; t <var - 1 ; t++){
 		mate = rank ^ v;
 		v = v <<  1;
@@ -85,12 +87,13 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 
 		//g += gp;
 		x_circle(g, gp);
+
 		if(mate<rank){
 			// l+=gp;
 			x_circle(l, gp);
 		}
+		printf("l: { {%d, %d}, {%d, %d} }, i=%d\n",l[0][0], l[0][1], l[1][0], l[1][1], t);
 	}
-	printf("l: { {%d, %d}, {%d, %d} }\n",l[0][0], l[0][1], l[1][0], l[1][1]);
 	memcpy(Mo, l, sizeof(l));
 	free(gp);
 	printf("Exiting parallel_prefix, rank = %d\n", rank);

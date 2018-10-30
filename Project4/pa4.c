@@ -74,8 +74,8 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 	printf("Starting parallel_prefix, rank = %d\n", rank);
 	
 	double var = log( (double) p) / log(2);
-	memcpy(l, Ml+((n/p) -1), sizeof(l));
-	memcpy(g, Ml+((n/p) -1), sizeof(g));
+	memcpy(l, Ml, sizeof(l));
+	memcpy(g, Ml, sizeof(g));
 	printf("g: { {%d, %d}, {%d, %d} }\n",g[0][0], g[0][1], g[1][0], g[1][1]);
 	printf("l: { {%d, %d}, {%d, %d} }\n",l[0][0], l[0][1], l[1][0], l[1][1]);
 	for(t = 0; t <var - 1 ; t++){

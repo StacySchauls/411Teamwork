@@ -28,11 +28,14 @@ int main(int argc, char *argv[]){
 	
 	//Each RANK generates a random array
 	gen_random(arr);
+	for(i = 0; i < n-1; i++){
+//	printf("rank: %d, arr[%d] : %d\n\n", rank,i, arr[i]);
+	}
 	if (rank == 0){
-		MPI_Gather(arr, n/p -1, MPI_INT, arr, n/p -1, MPI_INT, 0, MPI_COMM_WORLD);
+		MPI_Gather(arr, n/p, MPI_INT, arr, n/p , MPI_INT, 0, MPI_COMM_WORLD);
 	}
 	else{
-		MPI_Gather(arr, n/p -1, MPI_INT, NULL, n/p -1, MPI_INT, 0, MPI_COMM_WORLD);
+		MPI_Gather(arr, n/p, MPI_INT, NULL, n/p , MPI_INT, 0, MPI_COMM_WORLD);
 	}
 	p_diff = clock()-p_start - c_diff;
 	p_diff = p_diff * 1000000 / CLOCKS_PER_SEC;

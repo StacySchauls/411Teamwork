@@ -25,6 +25,7 @@ int main(int argc, char *argv[]){
 	p_diff = clock()-p_start - c_diff;
 	p_diff = p_diff * 1000000 / CLOCKS_PER_SEC;
 	c_diff = c_diff * 1000000 / CLOCKS_PER_SEC;
+	printf("gobbledy goop\n");
 	MPI_Finalize();
 	printf("the timeing s: parallel= %d, cereal = %d\n",(int) p_diff/1000000,(int) c_diff/1000000);
 	return 0;

@@ -13,7 +13,7 @@ int *serial_baseline(int output[]){
 //	printf("serial[0] : %d \n", seed);
 	for(i = 1; i<n; i++){
 		output[i] = (A* (output[i-1] ) + B )% big_prime;
-	//	printf("serial[%d] : %d \n", i, output[i]);
+		printf("serial[%d] : %d \n", i, output[i]);
 	}
 
 	return output;
@@ -24,19 +24,20 @@ int *serial_baseline(int output[]){
 
 void serial_matrix1(int output[], int N, int Mo[2][2]){
 	int i = 0;
-	int tA = Mo[0][0], tB = Mo[1][0];
+	long long tA = Mo[0][0], tB = Mo[1][0];
 	
-
+	printf("N is %d\n", N);
 //	printf("matrix[0] : %d \n", seed);
-	for(i = 0; i<N-1; i++){
+	for(i = 0; i<N; i++){
+		printf("i is : %d\n", i);
 		//calculate our matrix to the i-th power
 		output[i] = (tA* seed + tB )% big_prime;
 	//	printf("[%d, 0]\n[%d, 1] rank: %d \n\n", tA,tB,rank);
-	//	printf("matrix[%d] : %d rank %d \n\n", i, output[i],rank);
+		printf("matrix[%d] : %lld rank %d \n\n", i,(long long) output[i],rank);
 		tA = tA*A + 0;
 		tB = tB*A + B;
 	}
-	
+	printf("kdkhdhaadshhdasjfhdajkhfajhfaksjfhdjsfhjkfja\n");
 }
 /*int *serial_matrix(int n, int A, int B, int P, int output[]){
 	int seed = 909;
@@ -63,6 +64,7 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 	int l[2][2];
 	int g[2][2];
 	int *gp = (int *)malloc(sizeof(int[2][2]));
+	int *gt = (int *)malloc(sizeof(int[2][2]));
 	int v = 1, t = 1, mate = 0;
 	
 	double var = log( (double) p) / log(2);
@@ -71,7 +73,8 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 	for(t = 0; t <var - 1 ; t++){
 		mate = rank ^ v;
 		v = v <<  1;
-		MPI_Send(g, 4, MPI_INT, mate, 0, MPI_COMM_WORLD);//MIGHT BREAK
+		memcpy(gt,g, sizeof(g));
+		MPI_Send(gt, 4, MPI_INT, mate, 0, MPI_COMM_WORLD);//MIGHT BREAK
 		MPI_Recv(gp, 4, MPI_INT, mate, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 		//g += gp;
@@ -119,14 +122,15 @@ int *gen_random(void){
 	int Ml[2][2];
 	int Mo[2][2];
 	int i;
-	int array[n/p];
-	memset(array, 0 , sizeof(n/p));
+	int *array = (int *) malloc(n/p * sizeof(int));
+	memset(array, 0 , sizeof((n/p) * sizeof(int)));
 	//step 2: populate local xl
-	int *xl = (int*) malloc(n/p* sizeof(int[2][2]));
+	int *xl = (int*) malloc((n/p) * sizeof(int[2][2]));
 	for(i = 0; i < n/p; i++){
+		printf("in here okay %d \n", i);
 		memcpy(xl + (i* sizeof(int[2][2])), M, sizeof(M));
 	}
-
+	printf("yay we are out\n");
 	if(rank == 0)
 		memcpy(xl,Mp, sizeof(Mp));
 
@@ -138,12 +142,13 @@ int *gen_random(void){
 		x_circle(Ml, xl + (i* sizeof(int[2][2])));
 		memcpy(xl + (i* sizeof(int[2][2])), Ml, sizeof(Ml));
 	}
-	//step 4
+//step 4
 	parallel_prefix(Mo, xl);
 	
 	//step 5
-	serial_matrix1(array, n, Mo);
+	serial_matrix1(array, n/p, Mo);
 
+	printf("kdkhdhaadshhdasjfhdajkhfajhfaksjfhdjsfhjkfja\n");
 	return 0;
 }
 
@@ -151,6 +156,7 @@ int *gen_random(void){
 void x_circle(int d[2][2], int *m){
 	int t[2][2];
 	memcpy(t, d, sizeof(int[2][2]));
+	
 	d[0][0] = t[0][0] * *m     + t[0][1] * *(m+2);
 	d[0][1] = t[0][0] * *(m+1) + t[0][1] * *(m+3);
 	d[1][0] = t[1][0] * *m     + t[1][1] * *(m+2);

@@ -37,7 +37,6 @@ void serial_matrix1(int output[], int N, int Mo[2][2]){
 		tA = tA*A + 0;
 		tB = tB*A + B;
 	}
-	printf("kdkhdhaadshhdasjfhdajkhfajhfaksjfhdjsfhjkfja\n");
 }
 /*int *serial_matrix(int n, int A, int B, int P, int output[]){
 	int seed = 909;
@@ -115,7 +114,7 @@ void load_input(int argc, char *argv[]){
 
 }
 
-int *gen_random(int array[]){
+void gen_random(int array[]){
 	//step 1
 	int M[2][2] = { { A, 0}, {B, 1}};
 	int Mp[2][2] = { { 1, 0}, {0, 1}};

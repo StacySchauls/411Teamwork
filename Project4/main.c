@@ -26,7 +26,7 @@ int main(int argc, char *argv[]){
 	//serial_matrix(n,A,B,P, arr);
 	
 	//Each RANK generates a random array
-	gen_random();
+	gen_random(arr);
 	p_diff = clock()-p_start - c_diff;
 	p_diff = p_diff * 1000000 / CLOCKS_PER_SEC;
 	c_diff = c_diff * 1000000 / CLOCKS_PER_SEC;

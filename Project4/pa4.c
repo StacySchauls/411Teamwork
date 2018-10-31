@@ -28,9 +28,9 @@ void serial_matrix1(int output[], int Mo[2][2]){
 	if(rank == 0){
 	
 	}	
-	printf("\n\n- - - - - - - - - - - - - - - - - - - - - - - - -\n");
-	printf("Starting serial_matrix1, rank = %d\n", rank);
-	printf("Mo: { {%d, %d}, {%d, %d} }\n",Mo[0][0], Mo[0][1], Mo[1][0], Mo[1][1]);
+	//printf("\n\n- - - - - - - - - - - - - - - - - - - - - - - - -\n");
+	//printf("Starting serial_matrix1, rank = %d\n", rank);
+	//printf("Mo: { {%d, %d}, {%d, %d} }\n",Mo[0][0], Mo[0][1], Mo[1][0], Mo[1][1]);
 	//printf("N is %d\n", N);
 	//printf("matrix[0] : %d \n", seed);
 	for(i = 0; i<n-1; i++){
@@ -41,19 +41,21 @@ void serial_matrix1(int output[], int Mo[2][2]){
 			}
 		}else{
 
-		printf("i:%d\n", i);
+		//printf("i:%d\n", i);
 		output[i] = (tA* seed + tB )% big_prime;
-			printf("TA : [%lld, 0]\nTB: [%lld, 1] rank: %d \n\n", tA,tB,rank);
+			//printf("TA : [%lld, 0]\nTB: [%lld, 1] rank: %d \n\n", tA,tB,rank);
 			//printf("matrix[%d] : %lld rank %d \n\n", i,(long long) output[i],rank);
-			tA = tA*A + 0;
-			tB = tB*A + B;
+			tA =( tA*A + 0)%big_prime;
+			tB = (tB*A + B)%big_prime;
+			//tA =( tA*A + 0)%big_prime;
+			//tB = (tB*A + B)%big_prime;
 	}
 		
 	//printf("i is : %d\n", i);
 		//calculate our matrix to the i-th power
 	}
-	printf("Exiting serial_matrix1, rank = %d\n", rank);
-	printf("- - - - - - - - - - - - - - - - - - - - - - - - -\n");
+	//printf("Exiting serial_matrix1, rank = %d\n", rank);
+	//printf("- - - - - - - - - - - - - - - - - - - - - - - - -\n");
 }
 
 /*int *serial_matrix(int n, int A, int B, int P, int output[]){
@@ -88,12 +90,12 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 	printf("Starting parallel_prefix, rank = %d\n", rank);
 	*/
 	double var = log( (double) p) / log(2);
-	printf("%f\n", var);
+	//printf("%f\n", var);
 	memcpy(l, Ml + (4 * (n/p -1)) , sizeof(l));
 	memcpy(g, Ml + (4 * (n/p -1)) , sizeof(g));
 	
-	printf("g: { {%d, %d}, {%d, %d} }\n",g[0][0], g[0][1], g[1][0], g[1][1]);
-	printf("l: { {%d, %d}, {%d, %d} }\n",l[0][0], l[0][1], l[1][0], l[1][1]);
+	//printf("g: { {%d, %d}, {%d, %d} }\n",g[0][0], g[0][1], g[1][0], g[1][1]);
+	//printf("l: { {%d, %d}, {%d, %d} }\n",l[0][0], l[0][1], l[1][0], l[1][1]);
 	
 	for(t = 0; t <var ; t++){
 		mate = rank ^ v;
@@ -109,7 +111,7 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 			// l+=gp;
 			x_circle(l, gp);
 		}
-		printf("l END: { {%d, %d}, {%d, %d} }, i=%d\n",l[0][0], l[0][1], l[1][0], l[1][1], t);
+		//printf("l END: { {%d, %d}, {%d, %d} }, i=%d\n",l[0][0], l[0][1], l[1][0], l[1][1], t);
 	}
 	memcpy(Mo, l, sizeof(l));
 	//need to update local array with Mo
@@ -139,7 +141,7 @@ void load_input(int argc, char *argv[]){
 	int *arr = NULL;
 	arr = (int *) calloc(n , sizeof(int));
 	arr[0] = seed;
-	printf(" %s %s %s\n",  argv[1], argv[2], argv[3]);
+	//printf(" %s %s %s\n",  argv[1], argv[2], argv[3]);
 	n = atoi(argv[1]);
 	seed = atoi(argv[2]);
 	A = atoi(argv[3]);
@@ -172,7 +174,7 @@ void gen_random(int array[]){
 		//printf("in here okay %d \n", i);
 		//memcpy(xl + (i* sizeof(int[2][2])), M, sizeof(M));
 		memcpy(xl + (i* 4), M, sizeof(M));
-		printf("%d, %d, %d, %d\n",*(xl + (i*4)),*(xl + (i*4)+1),*(xl + (i*4)+2),*(xl + (i*4)+3));
+		//printf("%d, %d, %d, %d\n",*(xl + (i*4)),*(xl + (i*4)+1),*(xl + (i*4)+2),*(xl + (i*4)+3));
 	}
 	//printf("yay we are out\n");
 	if(rank == 0)
@@ -186,7 +188,7 @@ void gen_random(int array[]){
 		x_circle(Ml, xl + (i*4));
 		memcpy(xl + (i* 4), Ml, sizeof(Ml));
 		
-		printf("Ml: { {%d, %d}, {%d, %d} }\n",Ml[0][0], Ml[0][1], Ml[1][0], Ml[1][1]);
+		//printf("Ml: { {%d, %d}, {%d, %d} }\n",Ml[0][0], Ml[0][1], Ml[1][0], Ml[1][1]);
 	}
 	//step 4
 	parallel_prefix(Mo, xl);
@@ -202,10 +204,10 @@ void x_circle(int d[2][2], int *m){
 	
 	//printf("m: { {%d, %d}, {%d, %d} }\n",*m, *(m+1), *(m+2), *(m+3));
 
-	d[0][0] = t[0][0] * *m     + t[0][1] * *(m+2);
-	d[0][1] = t[0][0] * *(m+1) + t[0][1] * *(m+3);
-	d[1][0] = t[1][0] * *m     + t[1][1] * *(m+2);
-	d[1][1] = t[1][0] * *(m+1) + t[1][1] * *(m+3);
+	d[0][0] =( t[0][0] * *m     + t[0][1] * *(m+2))%big_prime;
+	d[0][1] =( t[0][0] * *(m+1) + t[0][1] * *(m+3))%big_prime;
+	d[1][0] =( t[1][0] * *m     + t[1][1] * *(m+2))%big_prime;
+	d[1][1] =( t[1][0] * *(m+1) + t[1][1] * *(m+3))%big_prime;
 	/*
 	printf("d: { {%d, %d}, {%d, %d} }\n",d[0][0], d[0][1], d[1][0], d[1][1]);
 	printf("t: { {%d, %d}, {%d, %d} }\n",t[0][0], t[0][1], t[1][0], t[1][1]);

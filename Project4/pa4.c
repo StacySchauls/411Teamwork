@@ -22,7 +22,7 @@ int *serial_baseline(int output[]){
 
 
 
-void serial_matrix1(int output[], int N, int Mo[2][2]){
+void serial_matrix1(int output[], int Mo[2][2]){
 	int i = 0;
 	long long tA = Mo[0][0], tB = Mo[1][0];
 	if(rank == 0){
@@ -102,13 +102,23 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 		//printf("l: { {%d, %d}, {%d, %d} }, i=%d\n",l[0][0], l[0][1], l[1][0], l[1][1], t);
 	}
 	memcpy(Mo, l, sizeof(l));
-	free(gp);
+	//need to update local array with Mo
+	postProcess(Ml, Mo);
 	/*
 	printf("Exiting parallel_prefix, rank = %d\n", rank);
 	printf("- - - - - - - - - - - - - - - - - - - - - - - - -\n");
 	*/
 }
 
+void postProcess(int *xl, int Mo[2][2]){
+	int i;
+	int mtemp[2][2];
+	for (i = 0; i < n/p; i++){
+		memcpy(mtemp, xl + i*4, 4*sizeof(int));
+		x_circle(mtemp, (int*)Mo);
+		memcpy(xl + i*4, mtemp,  4*sizeof(int));
+	}
+}
 
 void load_input(int argc, char *argv[]){
 	if(argc < 4){

@@ -25,13 +25,15 @@ int *serial_baseline(int output[]){
 void serial_matrix1(int output[], int N, int Mo[2][2]){
 	int i = 0;
 	long long tA = Mo[0][0], tB = Mo[1][0];
+	if(rank == 0){
 	
+	}	
 	printf("\n\n- - - - - - - - - - - - - - - - - - - - - - - - -\n");
 	printf("Starting serial_matrix1, rank = %d\n", rank);
 	printf("Mo: { {%d, %d}, {%d, %d} }\n",Mo[0][0], Mo[0][1], Mo[1][0], Mo[1][1]);
 	//printf("N is %d\n", N);
 	//printf("matrix[0] : %d \n", seed);
-	for(i = 0; i<N; i++){
+	for(i = 0; i<n-1; i++){
 		//printf("i is : %d\n", i);
 		//calculate our matrix to the i-th power
 		output[i] = (tA* seed + tB )% big_prime;
@@ -159,15 +161,15 @@ void gen_random(int array[]){
 	//step 3 calculate Mlocal
 
 	memcpy(Ml, Mp, sizeof(Mp));
-	for(i = 0; i < (n/p); i++){
+	for(i = 0; i < (n/p -1); i++){
 		//multiply matricies
 		x_circle(Ml, xl + (i*4));
 		memcpy(xl + (i* 4), Ml, sizeof(Ml));
 		
-//		printf("Ml: { {%d, %d}, {%d, %d} }\n",Ml[0][0], Ml[0][1], Ml[1][0], Ml[1][1]);
+		printf("Ml: { {%d, %d}, {%d, %d} }\n",Ml[0][0], Ml[0][1], Ml[1][0], Ml[1][1]);
 	}
 	//step 4
-	parallel_prefix(Mo,xl);
+	parallel_prefix(Mo, xl);
 	
 	//step 5
 	serial_matrix1(array, n/p, Mo);

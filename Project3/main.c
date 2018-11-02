@@ -26,7 +26,7 @@ int main(int argc, char **argv){
 		printf("init failed\n");
 		return -1;
 	}
-	displayGoL(local_grid, MPI_COMM_WORLD,rank);
+	//displayGoL(local_grid, MPI_COMM_WORLD,rank);
 	MPI_Finalize();
 
 	return 0;

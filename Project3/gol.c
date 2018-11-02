@@ -19,28 +19,27 @@ CELL **generateInitialGoL(int rank){
 			rNum = randNum();
 			MPI_Send(&rNum,1, MPI_INT, i, 0, MPI_COMM_WORLD);
 		}
-	}else{ // workers 1 :: p-1
-		int generated_num;
-		//printf("generateInitialGoL: rank %d\n", rank);
+		rNum = randNum();//This one is for rank 0 to use
+	}
+	else { // workers 1 :: p-1
+		//just recieve
 		MPI_Recv(&rNum, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		srand(rNum);
-		for(i = 0; i<(n/(p-1)); i++){
-			//	printf("\n");
-			for(k = 0; k<n; k++){
-				generated_num = randNum();
-				if(generated_num %2 == 0){
-
-					my_grid[i][k].old = 'x';
-					my_grid[i][k].cur = 'x';// set both to alive
-					//printf("cell at [%d][%d] is %c\n",i,k, my_grid[i][k].cur);
-					//printf("%c", my_grid[i][k].cur);
-				}else{
-
-					my_grid[i][k].old = '.';
-					my_grid[i][k].cur = '.';
-
-					//printf("%c", my_grid[i][k].cur);
-				}
+	}
+	srand(rNum);//every process does this
+	//printf("generateInitialGoL: rank %d\n", rank);
+	for(i = 0; i<(n/(p-1)); i++){
+		//	printf("\n");
+		for(k = 0; k<n; k++){
+			if(randNum() %2 == 0){
+				my_grid[i][k].old = 'x';
+				my_grid[i][k].cur = 'x';// set both to alive
+				//printf("cell at [%d][%d] is %c\n",i,k, my_grid[i][k].cur);
+				//printf("%c", my_grid[i][k].cur);
+			}
+			else {
+				my_grid[i][k].old = '.';
+				my_grid[i][k].cur = '.';
+				//printf("%c", my_grid[i][k].cur);
 			}
 		}
 	}
@@ -52,88 +51,73 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 	int i, j = 0;
 	Runtime sim_time;
 	Runtime gen_time;
-	Runtime blah_time;
+	//Runtime blah_time;
 
-	int blah_time_time =NULL;
+	//int blah_time_time =NULL;
 	char buf[n], bufBelow[n], bufAbove[n];
 	gettimeofday(&sim_time.t1, NULL);
 	memset(buf, 0, n);
 	memset(bufBelow, 0, n);
 	memset(bufAbove, 0, n);
-	if(rank == 0){
-		for(i = 0; i< G; i++){
-
-			//printf("BARRIER1 in simulate: rank %d\n",rank);
-			MPI_Barrier(comm);
-			//printf("BARRIER2 in simulate: rank %d\n",rank);
-			MPI_Barrier(comm);
-			//printf("BARRIER3 in simulate: rank %d\n",rank);
-			MPI_Barrier(comm);}
-
-	}else{
-
-		while (j < G){
-			gettimeofday(&gen_time.t1, NULL);
-			for(i = 0; i<n; i++){
-				buf[i] = grid[0][i].old;
-			}
-			//printf("BARRIER1 in simulate: rank %d\n",rank);
-			MPI_Barrier(comm);
-			if(rank != 1){
-				MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
-			}else{
-				MPI_Send(buf, n, MPI_CHAR, p-1,0,comm);
-			}
-
-			if(rank == p-1){
-				MPI_Recv(bufBelow, n, MPI_CHAR, 1, 0, comm, MPI_STATUS_IGNORE);
-			}else{
-				MPI_Recv(bufBelow, n, MPI_CHAR, rank+1, 0, comm, MPI_STATUS_IGNORE);
-			}
-			//printf("BARRIER2 in simulate: rank %d\n",rank);
-			MPI_Barrier(comm);
-
-			if(rank == p-1){
-				MPI_Send(buf, n, MPI_CHAR, 1,0,comm);
-			}else{
-				MPI_Send(buf, n, MPI_CHAR, rank +1,0,comm);
-			}
-
-			if(rank == 1){
-				MPI_Recv(bufAbove, n, MPI_CHAR, p-1,0,comm, MPI_STATUS_IGNORE);
-			}else{
-				MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm, MPI_STATUS_IGNORE);
-			}
-
-			//printf("BARRIER3 in simulate: rank %d\n",rank);
-			MPI_Barrier(comm);
-
-			determineState(grid, rank,bufAbove,0);
-			for(i = 1; i<(n/(p-1)); i++){
-				determineState(grid,rank,bufBelow,i);
-			}
-			j++;
-			gettimeofday(&gen_time.t2, NULL);
-			/*gettimeofday(&blah_time.t1,NULL);
-			int gen_avg = timeToMicroSec(&gen_time);
-			int *gen_avgs = NULL;
-			if (rank == 0){
-				gen_avgs = (int*)malloc(sizeof(int) *G);
-			}
-			else{
-				MPI_Gather(&gen_avg, 1, MPI_INT, gen_avgs, 1 , MPI_INT, 0, comm);
-			}
-			if (rank == 0){
-				int sum = 0;
-				for (i = 0; i < p; i++){
-					sum += gen_avgs[i];
-				}
-				gen_avg = (int)(sum/(double)G);
-			}
-			gettimeofday(&blah_time.t2,NULL);
-			blah_time_time = timeToMicroSec(&blah_time);*/
+	while (j < G){
+		gettimeofday(&gen_time.t1, NULL);
+		for(i = 0; i<n; i++){
+			buf[i] = grid[0][i].old;
 		}
+		//printf("BARRIER1 in simulate: rank %d\n",rank);
+		if(rank != 0){
+			MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
+		}else{
+			MPI_Send(buf, n, MPI_CHAR, p-1,0,comm);
+		}
+
+		if(rank == p-1){
+			MPI_Recv(bufBelow, n, MPI_CHAR, 0, 0, comm, MPI_STATUS_IGNORE);
+		}else{
+			MPI_Recv(bufBelow, n, MPI_CHAR, rank+1, 0, comm, MPI_STATUS_IGNORE);
+		}
+		//printf("BARRIER2 in simulate: rank %d\n",rank);
+
+		if(rank == p-1){
+			MPI_Send(buf, n, MPI_CHAR, 0,0,comm);
+		}else{
+			MPI_Send(buf, n, MPI_CHAR, rank+1,0,comm);
+		}
+
+		if(rank == 0){
+			MPI_Recv(bufAbove, n, MPI_CHAR, p-1,0,comm, MPI_STATUS_IGNORE);
+		}else{
+			MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm, MPI_STATUS_IGNORE);
+		}
+
+		//printf("BARRIER3 in simulate: rank %d\n",rank);
+
+		determineState(grid, rank,bufAbove,0);
+		for(i = 0; i<(n/(p-1)); i++){
+			determineState(grid,rank,bufBelow,i);
+		}
+		j++;
+		gettimeofday(&gen_time.t2, NULL);
+		/*gettimeofday(&blah_time.t1,NULL);
+		int gen_avg = timeToMicroSec(&gen_time);
+		int *gen_avgs = NULL;
+		if (rank == 0){
+			gen_avgs = (int*)malloc(sizeof(int) *G);
+		}
+		else{
+			MPI_Gather(&gen_avg, 1, MPI_INT, gen_avgs, 1 , MPI_INT, 0, comm);
+		}
+		if (rank == 0){
+			int sum = 0;
+			for (i = 0; i < p; i++){
+				sum += gen_avgs[i];
+			}
+			gen_avg = (int)(sum/(double)G);
+		}
+		gettimeofday(&blah_time.t2,NULL);
+		blah_time_time = timeToMicroSec(&blah_time);*/
 	}
+	
 	//printf("Rank %d is exiting simulate for row.\n",rank);
 	gettimeofday(&sim_time.t2, NULL);
 	int sim_avg = timeToMicroSec(&sim_time);
@@ -293,7 +277,7 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	//printf("The blocksize is: (%d * %d) / %d = %d\n",n,n,p-1,blocksize);
 	memset(buf, 0, blocksize);
 	//printf("Rank %d at barrier in display \n", rank);
-	MPI_Barrier(comm);
+	//MPI_Barrier(comm);
 	/*if (rank == 0) {
 		//recieve and print from each other process in order
 		for (i = 1; i < p-1; i++) {

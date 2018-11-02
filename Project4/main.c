@@ -16,8 +16,9 @@ int main(int argc, char *argv[]){
 
 	//this is our array of random numbers 
 	//n integers ON EACH PROCESS
+	//USE N/P FOR SIZE OF ARR. 
 	int *arr = (int*)malloc(n*sizeof(int));
-	memset(arr, 0, n);
+	memset(arr, 0, n);//memset(arr, 0, n/p * sizeof(int); 
 	if(rank == 0){//only RANK 0 runs the serial code. 
 		c_start = clock();
 		serial_baseline(arr);
@@ -25,12 +26,14 @@ int main(int argc, char *argv[]){
 	}
 	//putchar(10);
 	//serial_matrix(n,A,B,P, arr);
-	
+
 	//Each RANK generates a random array
 	gen_random(arr);
 	for(i = 0; i < n-1; i++){
-//	printf("rank: %d, arr[%d] : %d\n\n", rank,i, arr[i]);
+		//	printf("rank: %d, arr[%d] : %d\n\n", rank,i, arr[i]);
 	}
+	//we dont need gather. remove it and such
+	//FIX THIS. DONT NEED AN IF ELSE. CREATE A EW OUTPUT ARRAY OF SIZE N:w
 	if (rank == 0){
 		MPI_Gather(arr, n/p, MPI_INT, arr, n/p, MPI_INT, 0, MPI_COMM_WORLD);
 	}

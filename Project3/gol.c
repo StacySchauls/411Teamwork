@@ -88,6 +88,7 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 		}
 		j++;
 		gettimeofday(&gen_time.t2, NULL);
+	}
 	gettimeofday(&sim_time.t2, NULL);
 	int sim_avg = timeToMicroSec(&sim_time);
 	int * sim_avgs = NULL;
@@ -257,6 +258,6 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 
 int randNum(){
 	int i;
-	i = (rand() % big_prime) + 1;
+	i = (rand() % BIG_PRIME) + 1;
 	return i;
 }

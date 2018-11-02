@@ -148,7 +148,7 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 
 
 
-int determineState(CELL **grid, int rank, char buf[], int row){//updates a full row
+int determineState(CELL **grid, /*int rank,*/ char buf[], int row){//updates a full row
 	//printf("in determine state. Rank %d\n",rank);
 	//printf("DETERMINESTATE rank: %d  Row %d\n",rank,row);
 	int num_alive = 0, col = 0;
@@ -269,39 +269,29 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	int i = 0;
 	int j = 0;
 	int blocksize = (int)(((n*n)/(p-1)));
-	char buf[blocksize];
-	if(rank == 0){
+	char *board = (char *)calloc(n*n, sizeof(char));
 
-		//printf("\n\n");
+	char buf[blocksize*p];
+	memset(buf, 0, blocksize*p);
+	for (i = 0; i < n/p; i++){
+		for (j = 0; j < n; j++) {
+			buf[i*n + j] = grid[i][j].cur;
+		}
 	}
-	//printf("The blocksize is: (%d * %d) / %d = %d\n",n,n,p-1,blocksize);
-	memset(buf, 0, blocksize);
-	//printf("Rank %d at barrier in display \n", rank);
-	//MPI_Barrier(comm);
-	/*if (rank == 0) {
-		//recieve and print from each other process in order
-		for (i = 1; i < p-1; i++) {
+	MPI_Gather(board, blocksize, MPI_CHAR, board, blocksize, MPI_CHAR, 0, comm);
+	if (rank == 0){
+		for (i = 0; i < p; i++) {
 			//printf("Rank %d is Receiving from %d \n",rank,i);
-			MPI_Recv(buf, blocksize, MPI_CHAR, i, 0, comm, MPI_STATUS_IGNORE);
 			for (j = 0; j < blocksize; j++){
 				if (!(j%n) && j != 0){
-		//			putchar('\n');
+					putchar('\n');
 				}
-		//		putchar(buf[j]);
+				putchar(*(board + i*n + j));
 			}
-		//	putchar('\n');
+			putchar('\n');
 		}
 	}
-	else{
-		// send to rank 0 
-		for (i = 0; i < n/(p-1); i++){
-			for (j = 0; j < n; j++) {
-				buf[i*n + j] = grid[i][j].cur;
-			}
-		}
-		MPI_Send(buf, blocksize, MPI_CHAR, 0, 0, comm);
-	}
-	*/
+	free(board);
 	return 0;
 }
 

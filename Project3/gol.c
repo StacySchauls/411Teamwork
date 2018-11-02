@@ -8,7 +8,7 @@ CELL **generateInitialGoL(int rank){
 	int rNum,i,k; // <-- potential error spot
 
 	CELL **my_grid = (CELL **)malloc((n/p)*sizeof(CELL*));
-	for(j = 0; j<(n/(p-1)); j++){
+	for(j = 0; j<(n/p); j++){
 		my_grid[j] = (CELL*)malloc(n*sizeof(CELL));
 		my_grid[j]->cur = 0;
 		my_grid[j]->old = '\0';
@@ -26,20 +26,15 @@ CELL **generateInitialGoL(int rank){
 		MPI_Recv(&rNum, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 	}
 	srand(rNum);//every process does this
-	//printf("generateInitialGoL: rank %d\n", rank);
-	for(i = 0; i<(n/(p-1)); i++){
-		//	printf("\n");
+	for(i = 0; i<(n/p); i++){
 		for(k = 0; k<n; k++){
 			if(randNum() %2 == 0){
 				my_grid[i][k].old = 'x';
 				my_grid[i][k].cur = 'x';// set both to alive
-				//printf("cell at [%d][%d] is %c\n",i,k, my_grid[i][k].cur);
-				//printf("%c", my_grid[i][k].cur);
 			}
 			else {
 				my_grid[i][k].old = '.';
 				my_grid[i][k].cur = '.';
-				//printf("%c", my_grid[i][k].cur);
 			}
 		}
 	}
@@ -64,7 +59,6 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 		for(i = 0; i<n; i++){
 			buf[i] = grid[0][i].old;
 		}
-		//printf("BARRIER1 in simulate: rank %d\n",rank);
 		if(rank != 0){
 			MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
 		}else{
@@ -76,7 +70,6 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 		}else{
 			MPI_Recv(bufBelow, n, MPI_CHAR, rank+1, 0, comm, MPI_STATUS_IGNORE);
 		}
-		//printf("BARRIER2 in simulate: rank %d\n",rank);
 
 		if(rank == p-1){
 			MPI_Send(buf, n, MPI_CHAR, 0,0,comm);
@@ -89,57 +82,30 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 		}else{
 			MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm, MPI_STATUS_IGNORE);
 		}
-
-		//printf("BARRIER3 in simulate: rank %d\n",rank);
-
 		determineState(grid, rank,bufAbove,0);
-		for(i = 0; i<(n/(p-1)); i++){
+		for(i = 0; i<(n/(p) - 1); i++){
 			determineState(grid,rank,bufBelow,i);
 		}
 		j++;
 		gettimeofday(&gen_time.t2, NULL);
-		/*gettimeofday(&blah_time.t1,NULL);
-		int gen_avg = timeToMicroSec(&gen_time);
-		int *gen_avgs = NULL;
-		if (rank == 0){
-			gen_avgs = (int*)malloc(sizeof(int) *G);
-		}
-		else{
-			MPI_Gather(&gen_avg, 1, MPI_INT, gen_avgs, 1 , MPI_INT, 0, comm);
-		}
-		if (rank == 0){
-			int sum = 0;
-			for (i = 0; i < p; i++){
-				sum += gen_avgs[i];
-			}
-			gen_avg = (int)(sum/(double)G);
-		}
-		gettimeofday(&blah_time.t2,NULL);
-		blah_time_time = timeToMicroSec(&blah_time);*/
-	}
-	
-	//printf("Rank %d is exiting simulate for row.\n",rank);
 	gettimeofday(&sim_time.t2, NULL);
 	int sim_avg = timeToMicroSec(&sim_time);
 	int * sim_avgs = NULL;
 	if (rank == 0){
 		sim_avgs = (int*)malloc(sizeof(int) *p);
 	}
-	//simavg
-//	printf("%d,",sim_avg);
-		MPI_Gather(&sim_avg, 1, MPI_INT, sim_avgs, 1 , MPI_INT, 0, comm);
+	MPI_Gather(&sim_avg, 1, MPI_INT, sim_avgs, 1 , MPI_INT, 0, comm);
 	if (rank == 0){
 		
 		int sum = 0;
 		int *start;
 		start = sim_avgs;
 		for (i = 0; i < p; i++){
-		//	printf("%d,",i,*start);
 			sum += *start;
 			start++;
 		}
 		sim_avg = (int)(sum/(double)p);
-		printf("%d,%d,%d,%d",sim_avg,n,G,p);
+		printf("\n%d,%d,%d,%d\n",sim_avg,n,G,p);
 	}
 
 	return 0;
@@ -148,9 +114,7 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 
 
 
-int determineState(CELL **grid, /*int rank,*/ char buf[], int row){//updates a full row
-	//printf("in determine state. Rank %d\n",rank);
-	//printf("DETERMINESTATE rank: %d  Row %d\n",rank,row);
+int determineState(CELL **grid, int rank, char buf[], int row){//updates a full row
 	int num_alive = 0, col = 0;
 	// count the number of neighbors with old alive
 	for (col = 0; col < n; col++) {
@@ -250,7 +214,6 @@ int determineState(CELL **grid, /*int rank,*/ char buf[], int row){//updates a f
 			}
 		}
 
-		//printf("NUM ALIVE:%d\n",num_alive);
 		if (num_alive > 2 && num_alive < 6) { //we are alive
 			grid[row][col].old = grid[row][col].cur;
 			grid[row][col].cur = 'x';
@@ -261,7 +224,6 @@ int determineState(CELL **grid, /*int rank,*/ char buf[], int row){//updates a f
 			grid[row][col].cur = '.';
 		}
 	}
-	//printf("Rank %d is exiting DetermineState For row %d.\n",rank,row);
 	return 0;
 }
 
@@ -281,7 +243,6 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 	MPI_Gather(board, blocksize, MPI_CHAR, board, blocksize, MPI_CHAR, 0, comm);
 	if (rank == 0){
 		for (i = 0; i < p; i++) {
-			//printf("Rank %d is Receiving from %d \n",rank,i);
 			for (j = 0; j < blocksize; j++){
 				if (!(j%n) && j != 0){
 					putchar('\n');
@@ -291,13 +252,11 @@ int displayGoL(CELL **grid, MPI_Comm comm, int rank){
 			putchar('\n');
 		}
 	}
-	free(board);
 	return 0;
 }
 
 int randNum(){
 	int i;
-	i = (rand() % BIG_PRIME) + 1;
-	// printf("Returning: %d\n",i);
+	i = (rand() % big_prime) + 1;
 	return i;
 }

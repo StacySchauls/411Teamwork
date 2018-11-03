@@ -106,7 +106,7 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 			start++;
 		}
 		sim_avg = (int)(sum/(double)p);
-		printf("\n%d,%d,%d,%d\n",sim_avg,n,G,p);
+		printf("%d, %d, %d, %d\n",sim_avg,n,G,p);
 	}
 
 	return 0;

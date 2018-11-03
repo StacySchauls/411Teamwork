@@ -10,7 +10,50 @@
 #MPI helloworld example - this line is a comment
 #"np" stands for number of processes.
 #this command will run the job on 8 processes. 
-mpirun -np 5 ~/projects/411Teamwork/411Teamwork/Project3/run 20 10
+echo "time, n, G, p"
+mpirun -np   1 ~/411Teamwork/Project3/run   64 10
+mpirun -np   1 ~/411Teamwork/Project3/run  128 10
+mpirun -np   1 ~/411Teamwork/Project3/run  256 10
+mpirun -np   1 ~/411Teamwork/Project3/run  512 10
+mpirun -np   1 ~/411Teamwork/Project3/run 1024 10
+mpirun -np   1 ~/411Teamwork/Project3/run 2048 10
+mpirun -np   2 ~/411Teamwork/Project3/run   64 10
+mpirun -np   2 ~/411Teamwork/Project3/run  128 10
+mpirun -np   2 ~/411Teamwork/Project3/run  256 10
+mpirun -np   2 ~/411Teamwork/Project3/run  512 10
+mpirun -np   2 ~/411Teamwork/Project3/run 1024 10
+mpirun -np   2 ~/411Teamwork/Project3/run 2048 10
+mpirun -np   4 ~/411Teamwork/Project3/run   64 10
+mpirun -np   4 ~/411Teamwork/Project3/run  128 10
+mpirun -np   4 ~/411Teamwork/Project3/run  256 10
+mpirun -np   4 ~/411Teamwork/Project3/run  512 10
+mpirun -np   4 ~/411Teamwork/Project3/run 1024 10
+mpirun -np   4 ~/411Teamwork/Project3/run 2048 10
+mpirun -np   8 ~/411Teamwork/Project3/run   64 10
+mpirun -np   8 ~/411Teamwork/Project3/run  128 10
+mpirun -np   8 ~/411Teamwork/Project3/run  256 10
+mpirun -np   8 ~/411Teamwork/Project3/run  512 10
+mpirun -np   8 ~/411Teamwork/Project3/run 1024 10
+mpirun -np   8 ~/411Teamwork/Project3/run 2048 10
+mpirun -np  16 ~/411Teamwork/Project3/run   64 10
+mpirun -np  16 ~/411Teamwork/Project3/run  128 10
+mpirun -np  16 ~/411Teamwork/Project3/run  256 10
+mpirun -np  16 ~/411Teamwork/Project3/run  512 10
+mpirun -np  16 ~/411Teamwork/Project3/run 1024 10
+mpirun -np  16 ~/411Teamwork/Project3/run 2048 10
+mpirun -np  32 ~/411Teamwork/Project3/run   64 10
+mpirun -np  32 ~/411Teamwork/Project3/run  128 10
+mpirun -np  32 ~/411Teamwork/Project3/run  256 10
+mpirun -np  32 ~/411Teamwork/Project3/run  512 10
+mpirun -np  32 ~/411Teamwork/Project3/run 1024 10
+mpirun -np  32 ~/411Teamwork/Project3/run 2048 10
+mpirun -np  64 ~/411Teamwork/Project3/run   64 10
+mpirun -np  64 ~/411Teamwork/Project3/run  128 10
+mpirun -np  64 ~/411Teamwork/Project3/run  256 10
+mpirun -np  64 ~/411Teamwork/Project3/run  512 10
+mpirun -np  64 ~/411Teamwork/Project3/run 1024 10
+mpirun -np  64 ~/411Teamwork/Project3/run 2048 10
+
 
 
 # you can add more lines of commands here, if you wish.

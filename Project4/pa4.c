@@ -15,10 +15,10 @@ int *serial_baseline(int output[]){
 	//	printf("A B : %d %d \n",A, B);
 	int i = 0;
 	output[0] = seed;
-		printf("serial[0] : %d \n", seed);
+	//	printf("serial[0] : %d \n", seed);
 	for(i = 1; i<n; i++){
 		output[i] = (A* (output[i-1] ) + B )% big_prime;
-		printf("serial[%d] : %d \n", i, output[i]);
+	//	printf("serial[%d] : %d \n", i, output[i]);
 	}
 
 	return output;
@@ -38,7 +38,7 @@ void serial_matrix1(int output[], int Mo[2][2]){
 	//printf("Mo: { {%d, %d}, {%d, %d} }\n",Mo[0][0], Mo[0][1], Mo[1][0], Mo[1][1]);
 	//printf("N is %d\n", N);
 	//printf("matrix[0] : %d \n", seed);
-	for(i = 0; i<n-1; i++){
+	for(i = 0; i<n/p; i++){
 		if(rank == 0){
 			if(i ==0){
 
@@ -96,12 +96,14 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 	 */
 	double var = log( (double) p) / log(2);
 	//printf("%f\n", var);
+	
 	memcpy(l, Ml + (4 * (n/p -1)) , sizeof(l));
 	memcpy(g, Ml + (4 * (n/p -1)) , sizeof(g));
 
 	//printf("g: { {%d, %d}, {%d, %d} }\n",g[0][0], g[0][1], g[1][0], g[1][1]);
 	//printf("l: { {%d, %d}, {%d, %d} }\n",l[0][0], l[0][1], l[1][0], l[1][1]);
-
+	//MPI_Request reqs[2];
+	//MPI_Status stats[2];
 	for(t = 0; t <var ; t++){
 		mate = rank ^ v;
 		v = v <<  1;
@@ -109,6 +111,9 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 		MPI_Send(gt, 4, MPI_INT, mate, 0, MPI_COMM_WORLD);//MIGHT BREAK
 		MPI_Recv(gp, 4, MPI_INT, mate, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
+		//MPI_Isend(gt, 4, MPI_INT, mate, 0, MPI_COMM_WORLD, &reqs[0]);//MIGHT BREAK
+		//MPI_Irecv(gp, 4, MPI_INT, mate, 0, MPI_COMM_WORLD, &reqs[1]);
+		//MPI_Waitall(2,reqs,stats);
 		//g += gp;
 		x_circle(g, gp);
 
@@ -121,6 +126,7 @@ void parallel_prefix(int Mo[2][2], int * Ml){
 	memcpy(Mo, l, sizeof(l));
 	//need to update local array with Mo
 	postProcess(Ml, Mo);
+	
 	/*
 	   printf("Exiting parallel_prefix, rank = %d\n", rank);
 	   printf("- - - - - - - - - - - - - - - - - - - - - - - - -\n");
@@ -172,32 +178,33 @@ void gen_random(int array[]){
 	int Mo[2][2];
 	int i;
 
-	memset(array, 0 , sizeof((n/p) * sizeof(int)));
+	//	memset(array, 0 , sizeof((n/p) * sizeof(int)));
 	//step 2: populate local xl
-	int *xl = (int*) malloc((n/p) * sizeof(int[2][2]));
+		int *xl = (int*) malloc((n/p) * sizeof(int[2][2]));
 	for(i = 0; i < n/p; i++){
 		//printf("in here okay %d \n", i);
 		//memcpy(xl + (i* sizeof(int[2][2])), M, sizeof(M));
-		memcpy(xl + (i* 4), M, sizeof(M));
+			memcpy(xl + (i* 4), M, sizeof(M));
 		//printf("%d, %d, %d, %d\n",*(xl + (i*4)),*(xl + (i*4)+1),*(xl + (i*4)+2),*(xl + (i*4)+3));
 	}
 	//printf("yay we are out\n");
-	if(rank == 0)
+	if(rank == 0){
 		memcpy(xl,Mp, sizeof(Mp));
-
+	}
 	//step 3 calculate Mlocal
 	//this is an issue. mem sizes? something. This is wheere its crashing
-	memcpy(Ml, Mp, sizeof(Mp));
-	for(i = 0; i < (n/p-1); i++){
+		memcpy(Ml, Mp, sizeof(Mp));
+	
+	for(i = 0; i < (n/p); i++){
 		//multiply matricies
-		x_circle(Ml, xl + (i*4));
+		x_circle(Ml, xl + (i+4));
 		memcpy(xl + (i* 4), Ml, sizeof(Ml));
 
 		//printf("Ml: { {%d, %d}, {%d, %d} }\n",Ml[0][0], Ml[0][1], Ml[1][0], Ml[1][1]);
 	}
 	//step 4
 	parallel_prefix(Mo, xl);
-
+	
 	//step 5
 	//this is also probably an issue, in here;
 	serial_matrix1(array,Mo);
@@ -209,7 +216,6 @@ void x_circle(int d[2][2], int *m){
 	memcpy(t, d, sizeof(int[2][2]));
 
 	//printf("m: { {%d, %d}, {%d, %d} }\n",*m, *(m+1), *(m+2), *(m+3));
-
 	d[0][0] =( t[0][0] * *m     + t[0][1] * *(m+2))%big_prime;
 	d[0][1] =( t[0][0] * *(m+1) + t[0][1] * *(m+3))%big_prime;
 	d[1][0] =( t[1][0] * *m     + t[1][1] * *(m+2))%big_prime;

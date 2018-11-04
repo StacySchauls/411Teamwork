@@ -42,23 +42,27 @@ CELL **generateInitialGoL(int rank){
 }
 
 int simulate(CELL **grid, MPI_Comm comm, int rank){
-
+  struct timeval tv1,tv2,tv3,tv4;
+ long double total, total2;
+total = 0;
 	int i, j = 0;
 	Runtime sim_time;
 	Runtime gen_time;
 	//Runtime blah_time;
-
+  
 	//int blah_time_time =NULL;
 	char buf[n], bufBelow[n], bufAbove[n];
 	gettimeofday(&sim_time.t1, NULL);
 	memset(buf, 0, n);
 	memset(bufBelow, 0, n);
 	memset(bufAbove, 0, n);
+
 	while (j < G){
 		gettimeofday(&gen_time.t1, NULL);
 		for(i = 0; i<n; i++){
 			buf[i] = grid[0][i].old;
 		}
+gettimeofday(&tv1,NULL);
 		if(rank != 0){
 			MPI_Send(buf, n, MPI_CHAR, rank-1,0,comm);
 		}else{
@@ -82,21 +86,26 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 		}else{
 			MPI_Recv(bufAbove, n, MPI_CHAR, rank-1,0,comm, MPI_STATUS_IGNORE);
 		}
+  gettimeofday(&tv2, NULL);
 		determineState(grid, rank,bufAbove,0);
 		for(i = 0; i<(n/(p) - 1); i++){
 			determineState(grid,rank,bufBelow,i);
 		}
 		j++;
 		gettimeofday(&gen_time.t2, NULL);
-	}
+total += total + tv1.tv_usec + tv2_tv.usec;
+}
 	gettimeofday(&sim_time.t2, NULL);
 	int sim_avg = timeToMicroSec(&sim_time);
 	int * sim_avgs = NULL;
 	if (rank == 0){
 		sim_avgs = (int*)malloc(sizeof(int) *p);
 	}
+gettimeofday(&tv3, NULL);
 	MPI_Gather(&sim_avg, 1, MPI_INT, sim_avgs, 1 , MPI_INT, 0, comm);
-	if (rank == 0){
+gettimeofday(&tv4, NULL);
+total += total + tv4_tv.usec + tv3_tv.usec;
+  if (rank == 0){
 		
 		int sum = 0;
 		int *start;
@@ -107,7 +116,9 @@ int simulate(CELL **grid, MPI_Comm comm, int rank){
 		}
 		sim_avg = (int)(sum/(double)p);
 		printf("%d, %d, %d, %d\n",sim_avg,n,G,p);
-	}
+    printf("Total com time waas: %Lf\n",total);
+}
+
 
 	return 0;
 }

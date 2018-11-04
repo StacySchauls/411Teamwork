@@ -93,7 +93,7 @@ gettimeofday(&tv1,NULL);
 		}
 		j++;
 		gettimeofday(&gen_time.t2, NULL);
-total += total + tv1.tv_usec + tv2_tv.usec;
+total += total + (tv2.tv_usec - tv1.tv_usec);
 }
 	gettimeofday(&sim_time.t2, NULL);
 	int sim_avg = timeToMicroSec(&sim_time);
@@ -104,7 +104,7 @@ total += total + tv1.tv_usec + tv2_tv.usec;
 gettimeofday(&tv3, NULL);
 	MPI_Gather(&sim_avg, 1, MPI_INT, sim_avgs, 1 , MPI_INT, 0, comm);
 gettimeofday(&tv4, NULL);
-total += total + tv4_tv.usec + tv3_tv.usec;
+total += total +( tv4.tv_usec - tv3.tv_usec);
   if (rank == 0){
 		
 		int sum = 0;
